@@ -102,6 +102,7 @@ public class RookMoveCalculator extends PieceMoveCalculator {
             availColumn--;
         }
 
+
         return pieceMoves;
     }
 

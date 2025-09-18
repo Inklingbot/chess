@@ -31,8 +31,153 @@ public class QueenMoveCalculator extends PieceMoveCalculator {
         setPosition(position);
 
         int availRow = position.getRow() + 1;
-        int availColumn = position.getColumn() + 1;
+        int availColumn = position.getColumn();
+        //Vertical and Horizontal Movement
 
+        while(availRow <= 8) {
+            ChessPosition availSpace = new ChessPosition(availRow, availColumn);
+            //If the space is empty, or if the team color of the piece there is different from the og's piece color
+            if (board.getPiece(availSpace) == null) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+            else if (board.getPiece(availSpace).getTeamColor() != piece.getTeamColor()) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+                break;
+            }
+            else {
+                break;
+            }
+            availRow++;
+        }
+
+        availRow = position.getRow() - 1;
+        while(availRow > 0) {
+            ChessPosition availSpace = new ChessPosition(availRow, availColumn);
+            //If the space is empty, or if the team color of the piece there is different from the og's piece color
+            if (board.getPiece(availSpace) == null) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+            else if (board.getPiece(availSpace).getTeamColor() != piece.getTeamColor()) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+                break;
+            }
+            else {
+                break;
+            }
+            availRow--;
+        }
+
+        availRow = position.getRow();
+        availColumn = position.getColumn() + 1;
+        while(availColumn <= 8) {
+            ChessPosition availSpace = new ChessPosition(availRow, availColumn);
+            //If the space is empty, or if the team color of the piece there is different from the og's piece color
+            if (board.getPiece(availSpace) == null) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+            else if (board.getPiece(availSpace).getTeamColor() != piece.getTeamColor()) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+                break;
+            }
+            else {
+                break;
+            }
+            availColumn++;
+        }
+
+        availColumn = position.getColumn() - 1;
+        while(availColumn > 0) {
+            ChessPosition availSpace = new ChessPosition(availRow, availColumn);
+            //If the space is empty, or if the team color of the piece there is different from the og's piece color
+            if (board.getPiece(availSpace) == null) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+            else if (board.getPiece(availSpace).getTeamColor() != piece.getTeamColor()) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+                break;
+            }
+            else {
+                break;
+            }
+            availColumn--;
+        }
+
+        //DIAGONAL MOVEMENT
+
+        availRow = position.getRow() + 1;
+        availColumn = position.getColumn() + 1;
+        while(availRow <= 8 && availColumn <= 8) {
+            ChessPosition availSpace = new ChessPosition(availRow, availColumn);
+            if (board.getPiece(availSpace) == null) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+            else if (board.getPiece(availSpace).getTeamColor() != piece.getTeamColor()) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+                break;
+            }
+            else {
+                break;
+            }
+
+            availRow++;
+            availColumn++;
+        }
+
+        availRow = position.getRow() - 1;
+        availColumn = position.getColumn() + 1;
+        while(availRow > 0 && availColumn <= 8) {
+            ChessPosition availSpace = new ChessPosition(availRow, availColumn);
+            if (board.getPiece(availSpace) == null) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+            else if (board.getPiece(availSpace).getTeamColor() != piece.getTeamColor()) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+                break;
+            }
+            else {
+                break;
+            }
+
+            availRow--;
+            availColumn++;
+        }
+
+        availRow = position.getRow() + 1;
+        availColumn = position.getColumn() - 1;
+        while(availRow <= 8 && availColumn > 0) {
+            ChessPosition availSpace = new ChessPosition(availRow, availColumn);
+            if (board.getPiece(availSpace) == null) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+            else if (board.getPiece(availSpace).getTeamColor() != piece.getTeamColor()) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+                break;
+            }
+            else {
+                break;
+            }
+            availRow++;
+            availColumn--;
+        }
+
+        availRow = position.getRow() - 1;
+        availColumn = position.getColumn() - 1;
+        while(availRow > 0 && availColumn > 0) {
+            ChessPosition availSpace = new ChessPosition(availRow, availColumn);
+            if (board.getPiece(availSpace) == null) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+            else if (board.getPiece(availSpace).getTeamColor() != piece.getTeamColor()) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+                break;
+            }
+            else {
+                break;
+            }
+
+            availRow--;
+            availColumn--;
+        }
         return pieceMoves;
     }
 
