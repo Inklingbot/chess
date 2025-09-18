@@ -29,6 +29,90 @@ public class KnightMoveCalculator extends PieceMoveCalculator {
         Collection<ChessMove> pieceMoves = new ArrayList<>(List.of());
         setBoard(board);
         setPosition(position);
+
+        int row = position.getRow();
+        int column = position.getColumn();
+        if (row + 1 <= 8 && column + 2 <= 8) {
+            ChessPosition availSpace = new ChessPosition(row + 1, column + 2);
+            if (getBoard().getPiece(availSpace) == null) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+            else if (getBoard().getPiece(availSpace).getTeamColor() != piece.getTeamColor()) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+        }
+
+        if (row - 1 > 0 && column + 2 <= 8) {
+            ChessPosition availSpace = new ChessPosition(row - 1, column + 2);
+            if (getBoard().getPiece(availSpace) == null) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+            else if (getBoard().getPiece(availSpace).getTeamColor() != piece.getTeamColor()) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+        }
+
+        if (row + 2 <= 8 && column + 1 <= 8) {
+            ChessPosition availSpace = new ChessPosition(row + 2, column + 1);
+            if (getBoard().getPiece(availSpace) == null) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+            else if (getBoard().getPiece(availSpace).getTeamColor() != piece.getTeamColor()) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+        }
+
+        if (row - 2 > 0 && column + 1 <= 8) {
+            ChessPosition availSpace = new ChessPosition(row - 2, column + 1);
+            if (getBoard().getPiece(availSpace) == null) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+            else if (getBoard().getPiece(availSpace).getTeamColor() != piece.getTeamColor()) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+        }
+
+        if (row + 2 <= 8 && column - 1 > 0) {
+            ChessPosition availSpace = new ChessPosition(row + 2, column - 1);
+            if (getBoard().getPiece(availSpace) == null) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+            else if (getBoard().getPiece(availSpace).getTeamColor() != piece.getTeamColor()) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+        }
+
+        if (row - 2 > 0 &&  column - 1 > 0) {
+            ChessPosition availSpace = new ChessPosition(row - 2, column - 1);
+            if (getBoard().getPiece(availSpace) == null) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+            else if (getBoard().getPiece(availSpace).getTeamColor() != piece.getTeamColor()) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+        }
+
+        if (row + 1 <= 8 &&  column - 2 > 0) {
+            ChessPosition availSpace = new ChessPosition(row + 1, column - 2);
+            if (getBoard().getPiece(availSpace) == null) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+            else if (getBoard().getPiece(availSpace).getTeamColor() != piece.getTeamColor()) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+        }
+
+        if (row - 1 > 0 &&  column - 2 > 0) {
+            ChessPosition availSpace = new ChessPosition(row - 1, column - 2);
+            if (getBoard().getPiece(availSpace) == null) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+            else if (getBoard().getPiece(availSpace).getTeamColor() != piece.getTeamColor()) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+        }
+
+
         return pieceMoves;
     }
 
