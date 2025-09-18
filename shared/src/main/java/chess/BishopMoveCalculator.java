@@ -27,8 +27,6 @@ public class BishopMoveCalculator extends PieceMoveCalculator {
     }
 
 
-    //Code from class (should it be an override? Is this the function where things are ACTUALLY calculated?
-    //What am I doing with the Superclass here? Don't I pass in information when I create a new object????
     @Override
     public Collection<ChessMove> pieceMoves(ChessPiece piece, ChessBoard board, ChessPosition position) {
         Collection<ChessMove> pieceMoves = new ArrayList<>(List.of());
@@ -39,18 +37,7 @@ public class BishopMoveCalculator extends PieceMoveCalculator {
         int availRow = position.getRow() + 1;
         int availColumn = position.getColumn() + 1;
         while(availRow <= 8 && availColumn <= 8) {
-            ChessPosition availSpace = new ChessPosition(availRow, availColumn);
-            //If the space is empty, or if the team color of the piece there is different from the og's piece color
-            if (board.getPiece(availSpace) == null) {
-                pieceMoves.add(new ChessMove (position, availSpace, null));
-            }
-            else if (board.getPiece(availSpace).getTeamColor() != piece.getTeamColor()) {
-                pieceMoves.add(new ChessMove (position, availSpace, null));
-                break;
-            }
-            else {
-                break;
-            }
+
 
             availRow++;
             availColumn++;
