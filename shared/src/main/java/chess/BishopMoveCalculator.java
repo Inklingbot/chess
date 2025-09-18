@@ -35,53 +35,83 @@ public class BishopMoveCalculator extends PieceMoveCalculator {
         setBoard(board);
         setPosition(position);
         //Check all spaces to the right
-        int row = position.getRow() - 1;
-        int column = position.getColumn() - 1;
 
-        //check spaces up and to the right of the piece
-        for (int i = row; i < 7; i++) {
-            for (int j = column; j < 7; j++) {
-                if (i + 1 < 7 && j + 1 < 7) {
-                    ChessPosition availSpace = new ChessPosition(row + 1, column + 1);
-                    if (board.getPiece(availSpace) == null) {
-                        pieceMoves.add(new ChessMove (position, availSpace, null));
-                    }
-                }
+        int availRow = position.getRow() + 1;
+        int availColumn = position.getColumn() + 1;
+        while(availRow <= 8 && availColumn <= 8) {
+            ChessPosition availSpace = new ChessPosition(availRow, availColumn);
+            //If the space is empty, or if the team color of the piece there is different from the og's piece color
+            if (board.getPiece(availSpace) == null) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
             }
-        }
-        //check spaces down and to the right of the piece
-        for (int i = row; i < 7; i++) {
-            for (int j = column; j > 0; j--) {
-                if (i + 1 < 7 && j + 1 < 7) {
-                    ChessPosition availSpace = new ChessPosition(row + 1, column - 1);
-                    if (board.getPiece(availSpace) == null) {
-                        pieceMoves.add(new ChessMove (position, availSpace, null));
-                    }
-                }
+            else if (board.getPiece(availSpace).getTeamColor() != piece.getTeamColor()) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+                break;
             }
-        }
-        //check spaces up and to the left of the piece
-        for (int i = row; i > 0; i--) {
-            for (int j = column; j < 7; j++) {
-                if (i + 1 < 7 && j + 1 < 7) {
-                    ChessPosition availSpace = new ChessPosition(row - 1, column + 1);
-                    if (board.getPiece(availSpace) == null) {
-                        pieceMoves.add(new ChessMove (position, availSpace, null));
-                    }
-                }
+            else {
+                break;
             }
+
+            availRow++;
+            availColumn++;
         }
-        //check spaces down and to the left of the piece
-        for (int i = row; i > 0; i--) {
-            for (int j = column; j > 0; j--) {
-                if (i + 1 < 7 && j + 1 < 7) {
-                    ChessPosition availSpace = new ChessPosition(row - 1, column - 1);
-                    if (board.getPiece(availSpace) == null) {
-                        pieceMoves.add(new ChessMove (position, availSpace, null));
-                    }
-                }
+
+        availRow = position.getRow() - 1;
+        availColumn = position.getColumn() + 1;
+        while(availRow > 0 && availColumn <= 8) {
+            ChessPosition availSpace = new ChessPosition(availRow, availColumn);
+            if (board.getPiece(availSpace) == null) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
             }
+            else if (board.getPiece(availSpace).getTeamColor() != piece.getTeamColor()) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+                break;
+            }
+            else {
+                break;
+            }
+
+            availRow--;
+            availColumn++;
         }
+
+        availRow = position.getRow() + 1;
+        availColumn = position.getColumn() - 1;
+        while(availRow <= 8 && availColumn > 0) {
+            ChessPosition availSpace = new ChessPosition(availRow, availColumn);
+            if (board.getPiece(availSpace) == null) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+            else if (board.getPiece(availSpace).getTeamColor() != piece.getTeamColor()) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+                break;
+            }
+            else {
+                break;
+            }
+            availRow++;
+            availColumn--;
+        }
+
+        availRow = position.getRow() - 1;
+        availColumn = position.getColumn() - 1;
+        while(availRow > 0 && availColumn > 0) {
+            ChessPosition availSpace = new ChessPosition(availRow, availColumn);
+            if (board.getPiece(availSpace) == null) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+            }
+            else if (board.getPiece(availSpace).getTeamColor() != piece.getTeamColor()) {
+                pieceMoves.add(new ChessMove (position, availSpace, null));
+                break;
+            }
+            else {
+                break;
+            }
+
+            availRow--;
+            availColumn--;
+        }
+
         //add everything in the set to the collection
 
 
@@ -94,21 +124,6 @@ public class BishopMoveCalculator extends PieceMoveCalculator {
     @Override
     public String toString() {
         return String.format("[%d, %d]", super.toString());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!super.equals(o)) {
-            return false;
-        }
-        BishopMoveCalculator calculator = (BishopMoveCalculator) o;
-
-        return calculator.position.equals(position);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getBoard(), getPosition());
     }
 
 
