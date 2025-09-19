@@ -63,7 +63,7 @@ public class PawnMoveCalculator extends PieceMoveCalculator {
             }
 
             //Move 1 Forward
-                if (wasAdded == false) {
+                if (!wasAdded) {
                     ChessPosition availSpace = new ChessPosition(row - 1, column);
                     addIfNull(availSpace, pieceMoves);
                 }
@@ -100,7 +100,7 @@ public class PawnMoveCalculator extends PieceMoveCalculator {
             }
 
             //Move 1 Forward
-            if (wasAdded == false) {
+            if (!wasAdded) {
                 ChessPosition availSpace = new ChessPosition(row + 1, column);
                 addIfNull(availSpace, pieceMoves);
             }
