@@ -82,7 +82,7 @@ public class KingMoveCalculator extends PieceMoveCalculator {
             }
         }
 
-        if (row - 1 > 0 &&  column - 1 <= 8) {
+        if (row - 1 > 0 &&  column - 1 > 0) {
             ChessPosition availSpace = new ChessPosition(row - 1, column - 1);
             if (getBoard().getPiece(availSpace) == null) {
                 pieceMoves.add(new ChessMove (position, availSpace, null));
