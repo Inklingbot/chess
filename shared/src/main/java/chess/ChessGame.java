@@ -62,21 +62,7 @@ public class ChessGame {
         return piece.pieceMoves(board, startPosition);
     }
 
-    public Collection<ChessMove> checkClearer(ChessPosition startPosition, Collection<ChessMove> validMoves) {
-        ChessPiece piece = board.getPiece(startPosition);
-        for (ChessMove move : validMoves) {
 
-        }
-        return validMoves;
-    }
-
-    public void checkChecker(ChessPosition startPosition, ChessMove move) {
-        ChessPiece piece = board.getPiece(startPosition);
-        if (board.getPiece(move.getEndPosition()) != null) {
-
-        }
-
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -100,20 +86,52 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         boolean wasValid = false;
+
+        //check that the start position is our team, and there's a piece there
+        if (board.getPiece(move.getStartPosition()) == null) {
+            throw new InvalidMoveException("Invalid move.");
+        }
+        if (board.getPiece(move.getStartPosition()).getTeamColor() != getTeamTurn()) {
+            throw new InvalidMoveException("Invalid move.");
+        }
+
+
+        //Check every valid move against the move that we want to be made
         for (ChessMove valid : validMoves(move.startPosition())) {
             if (valid.equals(move)) {
                 wasValid = true;
             }
         }
-        if (!wasValid) {
+        //Check to see if the team is in check
+        if (isInCheck(teamColor)) {
+
+        }
+        //IF the move was not a validMove, if the piece was in check, if there is not a piece at the start position, or if the move was for the other team...
+        if (!wasValid ||  board.getPiece(move.getStartPosition()).getTeamColor() != getTeamTurn()) {
+            //throw exception
             throw new InvalidMoveException(move.toString());
         }
+
+        //Delete piece at current location, and move it to new location
+        //Check if piece is at new location, then check to make sure it's the opposite piece type, then also check to make sure it's not a king
+        if (board.getPiece(move.getEndPosition()) != null) {
+            if (board.getPiece(move.getEndPosition()).getTeamColor() != getTeamTurn() && board.getPiece(move.getEndPosition()).getPieceType() != ChessPiece.PieceType.KING) {
+                board.removePiece(move.getEndPosition());
+            }
+            else if (board.getPiece(move.getEndPosition()).getTeamColor() == getTeamTurn()) {
+                throw new InvalidMoveException(move.toString());
+            }
+        }
+
+        //This is making the actual move :O
         ChessPiece piece = board.getPiece(move.getStartPosition());
         board.removePiece(move.getStartPosition());
         if (move.promotionPiece() != null) {
             piece.setPieceType(move.promotionPiece());
         }
         board.addPiece(move.endPosition(), piece);
+
+        //turn changer (I love turn changing)
         if (getTeamTurn() == WHITE) {
             setTeamTurn(BLACK);
         }
@@ -130,6 +148,26 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         boolean check = false;
+        //iterate through every square
+        for (int i = 1; i < 8; i++) {
+            for (int j = 1; i < 8; i++) {
+                ChessPosition currPos  = new ChessPosition(i, j);
+                //check if enemy piece
+                if (board.getPiece(currPos) != null && board.getPiece(currPos).getTeamColor() != teamColor) {
+                    //check every move it makes
+                    for (ChessMove move : validMoves(currPos)) {
+                        //if the space it moves to is not null
+                        if (board.getPiece(move.endPosition()) != null) {
+                            //if it's a king it can move to
+                            if (board.getPiece(move.endPosition()).getTeamColor() != teamColor && board.getPiece(move.endPosition()).getPieceType() == ChessPiece.PieceType.KING) {
+                                check = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
 
         return check;
     }

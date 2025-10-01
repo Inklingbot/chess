@@ -51,9 +51,6 @@ public class ChessBoard {
         return squares[position.getRow() - 1][position.getColumn() - 1];
     }
 
-    public ChessPiece findKing(ChessGame.TeamColor teamColor) {
-        return null;
-    }
 
     /**
      * Sets the board to the default starting board
@@ -76,10 +73,6 @@ public class ChessBoard {
         addPiece(new ChessPosition(2, 6), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
         addPiece(new ChessPosition(2, 7), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
         addPiece(new ChessPosition(2, 8), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
-
-
-
-
 
 
 
