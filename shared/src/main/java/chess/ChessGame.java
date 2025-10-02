@@ -271,22 +271,7 @@ public class ChessGame {
     public boolean isInCheckmate(TeamColor teamColor) {
         //You must be in check to be in checkmate, fellas
         if (isInCheck(teamColor)) {
-
-            //loop through every square
-            for (int k = 1; k <= 8; k++) {
-                for (int l = 1; l <= 8; l++) {
-                    ChessPosition currentPosition = new ChessPosition(k, l);
-                    //ensure it's the right team's piece (and there's a piece there)
-                    if(board.getPiece(currentPosition) != null && board.getPiece(currentPosition).getTeamColor() == teamColor) {
-                            Collection<ChessMove> guessAndCheck = validMoves(currentPosition);
-                            //if there are valid moves
-                        if (!guessAndCheck.isEmpty()) {
-                            return false;
-                        }
-                    }
-                }
-            }
-            return true;
+            return loopThroughAllSquares(teamColor);
         }
         return false;
 
@@ -313,13 +298,18 @@ public class ChessGame {
         turnSwitcher();
 
         //loop through every square
+
+        return loopThroughAllSquares(teamColor);
+    }
+
+    boolean loopThroughAllSquares(TeamColor teamColor) {
         for (int k = 1; k <= 8; k++) {
             for (int l = 1; l <= 8; l++) {
                 ChessPosition currentPosition = new ChessPosition(k, l);
                 //ensure it's the right team's piece (and there's a piece there)
-                if (board.getPiece(currentPosition) != null && board.getPiece(currentPosition).getTeamColor() == teamColor) {
+                if(board.getPiece(currentPosition) != null && board.getPiece(currentPosition).getTeamColor() == teamColor) {
                     Collection<ChessMove> guessAndCheck = validMoves(currentPosition);
-                    //for each possible move
+                    //if there are valid moves
                     if (!guessAndCheck.isEmpty()) {
                         return false;
                     }
