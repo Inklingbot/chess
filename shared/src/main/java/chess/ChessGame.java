@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -59,7 +60,35 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
-        return piece.pieceMoves(board, startPosition);
+
+
+        Collection<ChessMove> validMoves = piece.pieceMoves(board, startPosition);
+        ChessBoard original = (ChessBoard) board.clone();
+
+        Collection<ChessMove> validCopy = new ArrayList<>();
+        for (ChessMove move : validMoves) {
+            ChessBoard testingCopy;
+            testingCopy = (ChessBoard) board.clone();
+
+            setBoard(testingCopy);
+            if (board.getPiece(move.getEndPosition()) != null) {
+                board.removePiece(move.getEndPosition());
+            }
+            board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
+            board.removePiece(move.getStartPosition());
+
+            if (!isInCheck(teamColor)) {
+                validCopy.add(move);
+            }
+
+                setBoard(original);
+            }
+
+
+        return validCopy;
+
+
+
     }
 
 
@@ -89,10 +118,10 @@ public class ChessGame {
 
         //check that the start position is our team, and there's a piece there
         if (board.getPiece(move.getStartPosition()) == null) {
-            throw new InvalidMoveException("Invalid move.");
+            throw new InvalidMoveException("There's no piece here!");
         }
         if (board.getPiece(move.getStartPosition()).getTeamColor() != getTeamTurn()) {
-            throw new InvalidMoveException("Invalid move.");
+            throw new InvalidMoveException("You can't move this piece!");
         }
 
 
@@ -128,7 +157,6 @@ public class ChessGame {
                     throw new InvalidMoveException(move.toString());
                 }
                 setBoard(clonedBoard);
-
                 //Delete piece at current location, and move it to new location
                 //Check if piece is at new location, then check to make sure it's the opposite piece type, then also check to make sure it's not a king
                 if (board.getPiece(move.getEndPosition()) != null) {
@@ -143,11 +171,8 @@ public class ChessGame {
                 ChessPiece piecewise = board.getPiece(move.getStartPosition());
                 moveNSwitch(move, piecewise);
 
-
                 return;
             }
-
-
         }
         //IF the move was not a validMove, if the piece was in check, if there is not a piece at the start position, or if the move was for the other team...
         else if (!wasValid ||  board.getPiece(move.getStartPosition()).getTeamColor() != getTeamTurn()) {
@@ -178,7 +203,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        boolean check = false;
+
         //iterate through every square
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
@@ -186,13 +211,13 @@ public class ChessGame {
                 //check if enemy piece
                 if (board.getPiece(currPos) != null && board.getPiece(currPos).getTeamColor() != teamColor) {
                     //check every move it makes
-                    for (ChessMove move : validMoves(currPos)) {
+                    //THIS USED TO BE validMoves instead of pieceMoves
+                    for (ChessMove move : board.getPiece(currPos).pieceMoves(board, currPos)) {
                         //if the space it moves to is not null
                         if (board.getPiece(move.endPosition()) != null) {
                             //if it's a king it can move to
                             if (board.getPiece(move.endPosition()).getTeamColor() == teamColor && board.getPiece(move.endPosition()).getPieceType() == ChessPiece.PieceType.KING) {
-                                check = true;
-                                return check;
+                                return true;
                             }
                         }
                     }
@@ -201,7 +226,7 @@ public class ChessGame {
         }
 
 
-        return check;
+        return false;
     }
     //Move the piece, then switch team turns
     public void moveNSwitch(ChessMove move, ChessPiece piece) {
@@ -219,6 +244,7 @@ public class ChessGame {
             setTeamTurn(WHITE);
         }
     }
+
 
     /**
      * Determines if the given team is in checkmate
@@ -257,19 +283,20 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         //You must not be in check to be in stalemate, fellas
-        if (!isInCheck(teamColor)) {
+        if (isInCheck(teamColor)) {
+            return false;
+        }
 
-            //loop through every square
-            for (int k = 1; k <= 8; k++) {
-                for (int l = 1; l <= 8; l++) {
-                    ChessPosition currentPosition = new ChessPosition(k, l);
-                    //ensure it's the right team's piece (and there's a piece there)
-                    if(board.getPiece(currentPosition) != null) {
-                        Collection<ChessMove> guessAndCheck = validMoves(currentPosition);
-                        //for each possible move
-                        if (guessAndCheck != null) {
-                            return true;
-                        }
+        //loop through every square
+        for (int k = 1; k <= 8; k++) {
+            for (int l = 1; l <= 8; l++) {
+                ChessPosition currentPosition = new ChessPosition(k, l);
+                //ensure it's the right team's piece (and there's a piece there)
+                if (board.getPiece(currentPosition) != null && board.getPiece(currentPosition).getTeamColor() == teamColor) {
+                    Collection<ChessMove> guessAndCheck = validMoves(currentPosition);
+                    //for each possible move
+                    if (guessAndCheck != null) {
+                        return true;
                     }
                 }
             }
