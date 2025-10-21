@@ -1,36 +1,43 @@
 package server;
 
-import dataAccess.AuthDAO;
-import dataAccess.GameDAO;
-import dataAccess.UserDAO;
+import com.google.gson.Gson;
+import dataAccess.*;
 import io.javalin.*;
+import io.javalin.http.Handler;
+import io.javalin.http.UnauthorizedResponse;
+import model.UserData;
+import org.jetbrains.annotations.NotNull;
 import passoff.exception.ResponseParseException;
 import io.javalin.http.Context;
+import server.handlers.ClearGameHandler;
+import server.handlers.RegisterHandler;
 import service.GameService;
+import service.UserService;
+
+import static io.javalin.apibuilder.ApiBuilder.before;
 
 
 public class Server {
 
     private final Javalin javalin;
-    private GameService gameService = new GameService();
-    private AuthDAO authDAO;
-    private GameDAO gameDAO;
-    private UserDAO userDAO;
+    private AuthDAO authDAO = new MemoryAuthDAO();
+    private GameDAO gameDAO = new MemoryGameDAO();
+    private UserDAO userDAO = new MemoryUserDAO();
+    private GameService gameService = new GameService(authDAO, gameDAO, userDAO);
+    private UserService userService = new UserService(authDAO, userDAO);
 
-    public Server(GameService gameService, AuthDAO authDAO, GameDAO gameDAO, UserDAO userDAO) {
-        this.gameService = gameService;
-        this.authDAO = authDAO;
-        this.gameDAO = gameDAO;
-        this.userDAO = userDAO;
 
-        javalin = Javalin.create(config -> config.staticFiles.add("web"))
-                .delete("/db", this::clearGame)
-                .post("/user", this::register)
+    public Server() {
+        javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
-        ;
         // Register your endpoints and exception handlers here.
+        //Deletes all games
+        javalin.delete("/db", context -> new ClearGameHandler(gameService).handle(context));
 
-//        ClearGameHandler clearGame = new ClearGameHandler();
+
+        javalin.post("/user", context -> new RegisterHandler(userService).handle(context));
+
+
 
     }
 
@@ -39,29 +46,7 @@ public class Server {
         return javalin.port();
     }
 
-    private void clearGame(Context ctx) throws ResponseParseException {
-        gameService.clearGame();
-        ctx.status(200);
-    }
-
-    private void register(Context ctx) throws ResponseParseException {
-        //if successful, set ctx status to 200
-        //Give the info of the auth token and the username
-
-        //Failure methods:
-        //If a random error, ctx status is 400, return the message and then Error: bad request
-
-        //If name already taken, ctx status 403, and say already taken
-
-        //If random error, set ctx to 500, and give a description of error
-    }
-
-
     public void stop() {
         javalin.stop();
-    }
-
-    public void clearGameRequest() {
-
     }
 }

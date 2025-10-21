@@ -2,7 +2,6 @@ package dataAccess;
 
 import chess.ChessGame;
 import model.GameData;
-
 import java.util.HashMap;
 
 public class MemoryGameDAO implements GameDAO{
@@ -19,22 +18,27 @@ public class MemoryGameDAO implements GameDAO{
         games.put(id, game);
         return game;
     }
-//How can I access certain members of my object in the hashmap?
+
     @Override
     public String listGames() {
-//        return games.values.getGameName();
-        return null;
+        StringBuilder listOfGames = new StringBuilder();
+        for (int i = 1; i < id; i++) {
+            GameData game = games.get(id);
+            listOfGames.append(game.gameName()).append("\n");
+        }
+
+        return listOfGames.toString();
     }
 
     @Override
-    public void updateGame() {
-
+    public void updateGame(int gameID, GameData data) {
+        games.put(gameID, data);
     }
 
 
 
     @Override
-    public GameData getGame(int gameID) throws DataAccessException {
+    public GameData getGame(int gameID) {
         return games.get(gameID);
     }
 }
