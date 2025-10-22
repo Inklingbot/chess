@@ -25,26 +25,26 @@ public class GameService {
         gameDAO.clear();
         userDAO.clear();
     }
-    //ToDo
+
     public void joinGame(JoinGameRequest request) throws DataAccessException {
         if (request.gameID() == null) {
             throw new BadRequestResponse("Error: bad request");
         }
         GameData data = gameDAO.getGame(request.gameID());
-        if(Objects.equals(request.playerColor(), "Black") && data.blackUsername() != null
-        || Objects.equals(request.playerColor(), "White") && data.WhiteUsername() != null) {
+        if ((Objects.equals(request.playerColor(), "BLACK") && data.blackUsername() == null)
+                || (Objects.equals(request.playerColor(), "WHITE") && data.whiteUsername() == null)) {
             AuthData authData = authDAO.getAuth(request.authToken());
             if (authData == null) {
                 throw new UnauthorizedResponse("error: unauthorized");
             }
-            gameDAO.updateGame(request.gameID(), gameDAO.getGame(request.gameID()));
-        }
-        else {
-            throw new DuplicateNameException("Name taken");
+                gameDAO.updateGameUserJoin(request.playerColor(), authData.username(), request.gameID(), gameDAO.getGame(request.gameID()));
+
+        } else {
+            throw new DuplicateNameException("Error: already taken");
         }
     }
 
-    public ListGamesResult ListGames(ListGamesRequest request) throws Error, DataAccessException {
+    public ListGamesResult ListGames(ListGamesRequest request) throws DataAccessException {
         AuthData data = authDAO.getAuth(request.authToken());
         if (data == null) {
             throw new UnauthorizedResponse("error: unauthorized");
@@ -53,9 +53,17 @@ public class GameService {
     }
 
     //ToDo
-    public CreateGameResult CreateGame(CreateGameRequest request) throws Error {
-        return null;
+    public CreateGameResult CreateGame(CreateGameRequest request) throws DataAccessException {
+        AuthData data = authDAO.getAuth(request.authToken());
+        if (data == null) {
+            throw new UnauthorizedResponse("error: unauthorized");
+        }
+
+        GameData game = gameDAO.createGame(request.gameName());
+
+        return new CreateGameResult(game.gameID());
     }
 
 
 }
+

@@ -34,7 +34,6 @@ public class Server {
         //List Games
         javalin.get("/game", context -> new ListGamesHandler(gameService).handle(context));
         //Create a Game
-        //TODO
         javalin.post("/game", context -> new CreateGameHandler(gameService).handle(context));
         //Join a Game
         javalin.put("/game", context -> new JoinGameHandler(gameService).handle(context));

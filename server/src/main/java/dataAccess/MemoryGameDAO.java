@@ -2,7 +2,10 @@ package dataAccess;
 
 import chess.ChessGame;
 import model.GameData;
+
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class MemoryGameDAO implements GameDAO{
     private int id = 0;
@@ -14,32 +17,35 @@ public class MemoryGameDAO implements GameDAO{
 
     @Override
     public GameData createGame(String gameName) {
-        GameData game = new GameData(id++, null, null, gameName, new ChessGame());
+        GameData game = new GameData(++id, null, null, gameName, new ChessGame());
         games.put(id, game);
         return game;
     }
 
     @Override
-    public String listGames() {
-        StringBuilder listOfGames = new StringBuilder();
-        GameData gameCheck = games.get(1);
-        if (gameCheck == null) {
-            return listOfGames.toString();
-        }
-        for (int i = 1; i < id; i++) {
-            GameData game = games.get(id);
-            listOfGames.append(game.gameName()).append("\n");
-        }
+    public Collection<GameData> listGames() {
+        Collection<GameData> collectionOfGames = games.values();
 
-        return listOfGames.toString();
+
+        return collectionOfGames;
     }
 
     @Override
-    public void updateGame(int gameID, GameData data) {
+    public void updateGameID(int gameID, GameData data) {
         games.put(gameID, data);
     }
 
+    public void updateGameUserJoin(String color, String username, int gameID, GameData data) {
 
+        if (Objects.equals(color, "WHITE")) {
+            GameData newData = new GameData(gameID, username, data.blackUsername(), data.gameName(), data.chessGame());
+            games.put(gameID, newData);
+        }
+        else if(Objects.equals(color, "BLACK")) {
+            GameData newData = new GameData(gameID, data.whiteUsername(), username, data.gameName(), data.chessGame());
+            games.put(gameID, newData);
+        }
+    }
 
     @Override
     public GameData getGame(int gameID) {

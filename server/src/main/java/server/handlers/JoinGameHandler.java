@@ -22,8 +22,11 @@ public class JoinGameHandler implements Handler {
     public void handle(@NotNull Context ctx) {
         //Create request object from json
         try {
+            String authToken = ctx.header("authorization");
             JoinGameRequest request = gson.fromJson(ctx.body(), JoinGameRequest.class);
-            gameService.joinGame(request);
+            JoinGameRequest finishedRequest = new JoinGameRequest(authToken, request.playerColor(), request.gameID());
+            gameService.joinGame(finishedRequest);
+            ctx.status(200);
 
         }
         catch(DataAccessException d) {
