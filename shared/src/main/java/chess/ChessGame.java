@@ -136,6 +136,8 @@ public class ChessGame {
                 wasValid = true;
             }
         }
+
+        ChessPiece endPiece = board.getPiece(move.getEndPosition());
         //Check to see if the team is in check
         if (isInCheck(teamColor)) {
             //copy the board and make the move, if still in check, don't do that thing
@@ -151,6 +153,7 @@ public class ChessGame {
             ChessBoard clonedBoard;
             clonedBoard = (ChessBoard) board.clone();
             setBoard(testCopy);
+
             if (isInCheck(teamColor)) {
                 setBoard(clonedBoard);
                 throw new InvalidMoveException("Move not allowed! You are in Check.");
@@ -162,16 +165,9 @@ public class ChessGame {
                     throw new InvalidMoveException(move.toString());
                 }
                 setBoard(clonedBoard);
-                //Delete piece at current location, and move it to new location
-                //Check if piece is at new location, then check to make sure it's the opposite piece type,
-                // then also check to make sure it's not a king
-                if (board.getPiece(move.getEndPosition()) != null) {
-                    if (board.getPiece(move.getEndPosition()).getTeamColor() != getTeamTurn() &&
-                            board.getPiece(move.getEndPosition()).getPieceType() != ChessPiece.PieceType.KING) {
-                        board.removePiece(move.getEndPosition());
-                    } else if (board.getPiece(move.getEndPosition()).getTeamColor() == getTeamTurn()) {
-                        throw new InvalidMoveException(move.toString());
-                    }
+
+                if (endPiece != null) {
+                    deleteThisPiece(endPiece, move);
                 }
 
                 //This is making the actual move :O
@@ -188,17 +184,9 @@ public class ChessGame {
             throw new InvalidMoveException(move.toString());
         }
 
-        //Delete piece at current location, and move it to new location
-        //Check if piece is at new location, then check to make sure it's the opposite piece type,
-        //then also check to make sure it's not a king
-        else if (board.getPiece(move.getEndPosition()) != null) {
-            if (board.getPiece(move.getEndPosition()).getTeamColor() != getTeamTurn() &&
-                    board.getPiece(move.getEndPosition()).getPieceType() != ChessPiece.PieceType.KING) {
-                board.removePiece(move.getEndPosition());
-            }
-            else if (board.getPiece(move.getEndPosition()).getTeamColor() == getTeamTurn()) {
-                throw new InvalidMoveException(move.toString());
-            }
+
+        else if (endPiece != null) {
+            deleteThisPiece(endPiece, move);
         }
 
         //This is making the actual move :O
@@ -229,6 +217,19 @@ public class ChessGame {
             }
         }
         return false;
+    }
+
+    //Delete piece at current location, and move it to new location
+    //Check if piece is at new location, then check to make sure it's the opposite piece type,
+    //then also check to make sure it's not a king
+    public void deleteThisPiece(ChessPiece endPiece, ChessMove move) throws InvalidMoveException {
+        if (endPiece.getTeamColor() != getTeamTurn() &&
+                endPiece.getPieceType() != ChessPiece.PieceType.KING) {
+            board.removePiece(move.getEndPosition());
+        }
+        else if (endPiece.getTeamColor() == getTeamTurn()) {
+            throw new InvalidMoveException(move.toString());
+        }
     }
 
     public boolean iterateEachMove(Collection<ChessMove> pieceMoves, TeamColor currColor) {

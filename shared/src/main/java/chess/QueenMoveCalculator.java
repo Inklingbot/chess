@@ -16,14 +16,6 @@ public class QueenMoveCalculator extends PieceMoveCalculator {
         this.board = board;
     }
 
-    public ChessPosition getPosition() {
-        return position;
-    }
-
-    public void setPosition(ChessPosition position) {
-        this.position = position;
-    }
-
     @Override
     public Collection<ChessMove> pieceMoves(ChessPiece piece, ChessBoard board, ChessPosition position) {
         Collection<ChessMove> pieceMoves = new ArrayList<>(List.of());
@@ -39,4 +31,14 @@ public class QueenMoveCalculator extends PieceMoveCalculator {
     public String toString() {
         return String.format("[%d, %d]", super.toString());
     }
+
+    public ChessPosition getPosition() {
+        return position;
+    }
+
+    public void setPosition(ChessPosition position) {
+        this.position = position;
+    }
 }
+
+
