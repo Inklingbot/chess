@@ -1,6 +1,6 @@
 package service;
 
-import dataAccess.*;
+import dataaccess.*;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.UnauthorizedResponse;
 import model.AuthData;
@@ -27,9 +27,14 @@ public class GameService {
     }
 
     public void joinGame(JoinGameRequest request) throws DataAccessException {
-        if (request.gameID() == null) {
+        if (request.gameID() == null || request.authToken() == null || request.playerColor() == null) {
             throw new BadRequestResponse("Error: bad request");
         }
+
+        if((!Objects.equals(request.playerColor(), "BLACK") && !Objects.equals(request.playerColor(), "WHITE"))) {
+            throw new BadRequestResponse("Error: already taken");
+        }
+
         GameData data = gameDAO.getGame(request.gameID());
         if ((Objects.equals(request.playerColor(), "BLACK") && data.blackUsername() == null)
                 || (Objects.equals(request.playerColor(), "WHITE") && data.whiteUsername() == null)) {
@@ -52,7 +57,7 @@ public class GameService {
         return new ListGamesResult(gameDAO.listGames());
     }
 
-    //ToDo
+
     public CreateGameResult CreateGame(CreateGameRequest request) throws DataAccessException {
         AuthData data = authDAO.getAuth(request.authToken());
         if (data == null) {

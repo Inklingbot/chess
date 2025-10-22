@@ -2,15 +2,15 @@ package server.handlers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import dataAccess.DataAccessException;
-import dataAccess.DuplicateNameException;
+import dataaccess.DataAccessException;
+import dataaccess.DuplicateNameException;
+import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
+import io.javalin.http.UnauthorizedResponse;
 import org.jetbrains.annotations.NotNull;
 import service.GameService;
 import service.JoinGameRequest;
-import service.RegisterRequest;
-import service.UserService;
 
 public class JoinGameHandler implements Handler {
     private final Gson gson = new Gson();
@@ -39,6 +39,16 @@ public class JoinGameHandler implements Handler {
             String errorJson = createJsonError("Error: already taken");
             ctx.result(errorJson);
             ctx.status(403);
+        }
+        catch(BadRequestResponse b) {
+            String errorJson = createJsonError("Error: bad request");
+            ctx.result(errorJson);
+            ctx.status(400);
+        }
+        catch(UnauthorizedResponse u) {
+            String errorJson = createJsonError("Error: unauthorized");
+            ctx.result(errorJson);
+            ctx.status(401);
         }
 
 

@@ -1,6 +1,6 @@
 package server;
 
-import dataAccess.*;
+import dataaccess.*;
 import io.javalin.*;
 import server.handlers.*;
 import service.GameService;

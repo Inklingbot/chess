@@ -2,7 +2,7 @@ package server.handlers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import dataAccess.DataAccessException;
+import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import io.javalin.http.UnauthorizedResponse;
@@ -10,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import service.GameService;
 import service.ListGamesRequest;
 import service.ListGamesResult;
-import service.LogoutRequest;
 
 public class ListGamesHandler implements Handler {
     private final Gson gson = new Gson();
