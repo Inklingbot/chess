@@ -218,27 +218,37 @@ public class ChessGame {
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 ChessPosition currPos = new ChessPosition(i, j);
+
                 //check if enemy piece
                 if (board.getPiece(currPos) != null && board.getPiece(currPos).getTeamColor() != teamColor) {
                     //check every move it makes
-                    for (ChessMove move : board.getPiece(currPos).pieceMoves(board, currPos)) {
-                        //if the space it moves to is not null
-                        if (board.getPiece(move.endPosition()) != null &&
-                                (board.getPiece(move.endPosition()).getTeamColor() == teamColor &&
-                                        board.getPiece(move.endPosition()).getPieceType() == ChessPiece.PieceType.KING)) {
-                            //if it's a king it can move to
-                            if (board.getPiece(move.endPosition()).getTeamColor() == teamColor &&
-                                    board.getPiece(move.endPosition()).getPieceType() == ChessPiece.PieceType.KING) {
-                                return true;
-                            }
-
-                        }
+                    if (iterateEachMove(board.getPiece(currPos).pieceMoves(board, currPos), teamColor)) {
+                        return true;
                     }
                 }
             }
         }
         return false;
     }
+
+    public boolean iterateEachMove(Collection<ChessMove> pieceMoves, TeamColor currColor) {
+        for (ChessMove move : pieceMoves) {
+            ChessPiece endPiece = board.getPiece(move.endPosition());
+            //if the space it moves to is not null
+            if (checkIfEnemyKing(endPiece, currColor)) {
+                //if it's a king it can move to
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean checkIfEnemyKing(ChessPiece endPiece, TeamColor currColor) {
+        return endPiece != null &&
+                (endPiece.getTeamColor() == currColor &&
+                        endPiece.getPieceType() == ChessPiece.PieceType.KING);
+    }
+
     //Move the piece, then switch team turns
     public void moveNSwitch(ChessMove move, ChessPiece piece) {
         board.removePiece(move.getStartPosition());
