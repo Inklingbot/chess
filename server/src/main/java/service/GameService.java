@@ -59,6 +59,10 @@ public class GameService {
             throw new UnauthorizedResponse("error: unauthorized");
         }
 
+        if (request.authToken() == null || request.gameName() == null) {
+            throw new BadRequestResponse();
+        }
+
         GameData game = gameDAO.createGame(request.gameName());
 
         return new CreateGameResult(game.gameID());
