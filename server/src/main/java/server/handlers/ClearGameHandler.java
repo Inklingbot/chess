@@ -12,7 +12,7 @@ public class ClearGameHandler implements Handler {
         this.gameService = gameService;
     }
     @Override
-    public void handle(@NotNull Context ctx) throws Exception {
+    public void handle(@NotNull Context ctx) {
         try {gameService.clearGame();
             ctx.status(200);}
         catch (DataAccessException exception) {

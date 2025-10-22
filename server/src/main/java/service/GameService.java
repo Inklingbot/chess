@@ -4,7 +4,6 @@ import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
 import dataAccess.UserDAO;
-import com.google.gson.Gson;
 
 public class GameService {
     private AuthDAO authDAO;
@@ -23,8 +22,18 @@ public class GameService {
         gameDAO.clear();
         userDAO.clear();
     }
-
-    public void joinGame() {
+    //ToDo
+    public void joinGame() throws Error{
 
     }
+    //ToDo
+    public ListGamesResult ListGames(ListGamesRequest request) throws Error{
+        return null;
+    }
+    //ToDo
+    public CreateGameResult CreateGame(CreateGameRequest request) throws Error {
+        return null;
+    }
+
+
 }

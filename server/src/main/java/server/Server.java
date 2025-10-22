@@ -1,15 +1,9 @@
 package server;
 
-import com.google.gson.Gson;
 import dataAccess.*;
 import io.javalin.*;
-import io.javalin.http.Handler;
-import io.javalin.http.UnauthorizedResponse;
-import model.UserData;
-import org.jetbrains.annotations.NotNull;
-import passoff.exception.ResponseParseException;
-import io.javalin.http.Context;
 import server.handlers.ClearGameHandler;
+import server.handlers.LoginHandler;
 import server.handlers.RegisterHandler;
 import service.GameService;
 import service.UserService;
@@ -36,6 +30,8 @@ public class Server {
 
 
         javalin.post("/user", context -> new RegisterHandler(userService).handle(context));
+
+        javalin.post("/session", context -> new LoginHandler(userService).handle(context));
 
 
 
