@@ -27,10 +27,14 @@ public class RookMoveCalculator extends PieceMoveCalculator {
 
     @Override
     public Collection<ChessMove> pieceMoves(ChessPiece piece, ChessBoard board, ChessPosition position) {
-        Collection<ChessMove> pieceMoves = new ArrayList<>(List.of());
         setBoard(board);
         setPosition(position);
 
+        return rookLogic(piece, board, position);
+    }
+
+    public static Collection<ChessMove> rookLogic(ChessPiece piece, ChessBoard board, ChessPosition position) {
+        Collection<ChessMove> pieceMoves = new ArrayList<>(List.of());
         int availRow = position.getRow() + 1;
         int availColumn = position.getColumn();
 

@@ -29,11 +29,23 @@ public class BishopMoveCalculator extends PieceMoveCalculator {
 
     @Override
     public Collection<ChessMove> pieceMoves(ChessPiece piece, ChessBoard board, ChessPosition position) {
-        Collection<ChessMove> pieceMoves = new ArrayList<>(List.of());
+
         setBoard(board);
         setPosition(position);
+        return bishopLogic(piece, board, position);
+    }
 
 
+
+    //All Overrides (equal, toString, and Hashcode)
+    @Override
+    public String toString() {
+        return String.format("[%d, %d]", super.toString());
+    }
+
+
+    public static Collection<ChessMove> bishopLogic(ChessPiece piece, ChessBoard board, ChessPosition position) {
+        Collection<ChessMove> pieceMoves = new ArrayList<>(List.of());
         int availRow = position.getRow() + 1;
         int availColumn = position.getColumn() + 1;
 
@@ -118,14 +130,4 @@ public class BishopMoveCalculator extends PieceMoveCalculator {
 
         return pieceMoves;
     }
-
-
-
-    //All Overrides (equal, toString, and Hashcode)
-    @Override
-    public String toString() {
-        return String.format("[%d, %d]", super.toString());
-    }
-
-
 }
