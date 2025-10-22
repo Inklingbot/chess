@@ -30,11 +30,6 @@ public class MemoryGameDAO implements GameDAO{
         return collectionOfGames;
     }
 
-    @Override
-    public void updateGameID(int gameID, GameData data) {
-        games.put(gameID, data);
-    }
-
     public void updateGameUserJoin(String color, String username, int gameID, GameData data) {
 
         if (Objects.equals(color, "WHITE")) {

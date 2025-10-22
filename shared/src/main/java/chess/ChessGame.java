@@ -217,26 +217,26 @@ public class ChessGame {
         //iterate through every square
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
-                ChessPosition currPos  = new ChessPosition(i, j);
+                ChessPosition currPos = new ChessPosition(i, j);
                 //check if enemy piece
                 if (board.getPiece(currPos) != null && board.getPiece(currPos).getTeamColor() != teamColor) {
                     //check every move it makes
-                    //THIS USED TO BE validMoves instead of pieceMoves
                     for (ChessMove move : board.getPiece(currPos).pieceMoves(board, currPos)) {
                         //if the space it moves to is not null
-                        if (board.getPiece(move.endPosition()) != null) {
+                        if (board.getPiece(move.endPosition()) != null &&
+                                (board.getPiece(move.endPosition()).getTeamColor() == teamColor &&
+                                        board.getPiece(move.endPosition()).getPieceType() == ChessPiece.PieceType.KING)) {
                             //if it's a king it can move to
                             if (board.getPiece(move.endPosition()).getTeamColor() == teamColor &&
                                     board.getPiece(move.endPosition()).getPieceType() == ChessPiece.PieceType.KING) {
                                 return true;
                             }
+
                         }
                     }
                 }
             }
         }
-
-
         return false;
     }
     //Move the piece, then switch team turns
