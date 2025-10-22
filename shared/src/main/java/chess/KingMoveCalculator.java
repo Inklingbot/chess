@@ -16,13 +16,7 @@ public class KingMoveCalculator extends PieceMoveCalculator {
         this.board = board;
     }
 
-    public ChessPosition getPosition() {
-        return position;
-    }
 
-    public void setPosition(ChessPosition position) {
-        this.position = position;
-    }
 
     @Override
     public Collection<ChessMove> pieceMoves(ChessPiece piece, ChessBoard board, ChessPosition position) {
@@ -114,6 +108,16 @@ public class KingMoveCalculator extends PieceMoveCalculator {
 
 
         return pieceMoves;
+
+
+    }
+
+    public ChessPosition getPosition() {
+        return position;
+    }
+
+    public void setPosition(ChessPosition position) {
+        this.position = position;
     }
 
     @Override

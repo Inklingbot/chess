@@ -16,13 +16,7 @@ public class PawnMoveCalculator extends PieceMoveCalculator {
         this.board = board;
     }
 
-    public ChessPosition getPosition() {
-        return position;
-    }
 
-    public void setPosition(ChessPosition position) {
-        this.position = position;
-    }
 
     @Override
     public Collection<ChessMove> pieceMoves(ChessPiece piece, ChessBoard board, ChessPosition position) {
@@ -144,6 +138,14 @@ public class PawnMoveCalculator extends PieceMoveCalculator {
             }
             pieceMoves.add(new ChessMove(position, newPosition, null));
         }
+    }
+
+    public ChessPosition getPosition() {
+        return position;
+    }
+
+    public void setPosition(ChessPosition position) {
+        this.position = position;
     }
 
     @Override
