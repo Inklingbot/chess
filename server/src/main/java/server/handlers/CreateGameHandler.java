@@ -22,7 +22,7 @@ public class CreateGameHandler implements Handler {
             String gameName = ctx.body();
             service.CreateGameNameRequest requestName = gson.fromJson(gameName, CreateGameNameRequest.class);
             CreateGameRequest request = new CreateGameRequest(authToken, requestName.gameName());
-            CreateGameResult result = gameService.CreateGame(request);
+            CreateGameResult result = gameService.createGame(request);
             String jsonString = gson.toJson(result);
             ctx.result(jsonString);
             ctx.status(200);

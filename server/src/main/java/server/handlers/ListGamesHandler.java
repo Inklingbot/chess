@@ -26,7 +26,7 @@ public class ListGamesHandler implements Handler {
                 throw new UnauthorizedResponse();
             }
             ListGamesRequest request = new ListGamesRequest(authToken);
-            ListGamesResult result = gameService.ListGames(request);
+            ListGamesResult result = gameService.listGames(request);
             String jsonString = gson.toJson(result);
             ctx.result(jsonString);
             ctx.status(200);

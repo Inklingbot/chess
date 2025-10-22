@@ -49,7 +49,7 @@ public class GameService {
         }
     }
 
-    public ListGamesResult ListGames(ListGamesRequest request) throws DataAccessException {
+    public ListGamesResult listGames(ListGamesRequest request) throws DataAccessException {
         AuthData data = authDAO.getAuth(request.authToken());
         if (data == null) {
             throw new UnauthorizedResponse("error: unauthorized");
@@ -58,7 +58,7 @@ public class GameService {
     }
 
 
-    public CreateGameResult CreateGame(CreateGameRequest request) throws DataAccessException {
+    public CreateGameResult createGame(CreateGameRequest request) throws DataAccessException {
         AuthData data = authDAO.getAuth(request.authToken());
         if (data == null) {
             throw new UnauthorizedResponse("error: unauthorized");
