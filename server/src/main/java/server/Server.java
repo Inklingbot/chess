@@ -3,6 +3,7 @@ package server;
 import dataAccess.*;
 import io.javalin.*;
 import server.handlers.ClearGameHandler;
+import server.handlers.LogOutHandler;
 import server.handlers.LoginHandler;
 import server.handlers.RegisterHandler;
 import service.GameService;
@@ -32,6 +33,8 @@ public class Server {
         javalin.post("/user", context -> new RegisterHandler(userService).handle(context));
 
         javalin.post("/session", context -> new LoginHandler(userService).handle(context));
+
+        javalin.delete("/session", context -> new LogOutHandler(userService).handle(context));
 
 
 

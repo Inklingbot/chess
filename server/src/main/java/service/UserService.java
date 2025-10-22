@@ -5,8 +5,11 @@ import dataAccess.DataAccessException;
 import dataAccess.DuplicateNameException;
 import dataAccess.UserDAO;
 import io.javalin.http.BadRequestResponse;
+import io.javalin.http.UnauthorizedResponse;
 import model.AuthData;
 import model.UserData;
+
+import java.util.Objects;
 
 public class UserService {
     AuthDAO authDAO;
@@ -34,15 +37,33 @@ public class UserService {
 
             return new RegisterResult(request.username(), authData.authToken());
     }
-//ToDo
+
+
     public LoginResult login(LoginRequest request) throws DataAccessException {
+        if(request.username() == null || request.password() == null) {
+            throw new BadRequestResponse("Error: bad request");
+        }
+        LoginResult result = null;
 
+        UserData user = userDAO.getUser(request.username());
+        if (Objects.equals(user.password(), request.password())) {
+            AuthData newData = authDAO.createAuth(request.username());
+            result = new LoginResult(newData.username(), newData.authToken());
+        }
+        else {
+            throw new UnauthorizedResponse("error: unauthorized");
+        }
 
-        return null;
+        return result;
     }
-    //ToDo
-    public void logout(LogoutRequest request) throws DataAccessException {
 
+    public void logout(LogoutRequest request) throws DataAccessException {
+        AuthData data = authDAO.getAuth(request.authToken());
+        if (data == null) {
+            throw new UnauthorizedResponse("error: unauthorized");
+        }
+
+        authDAO.deleteAuth(request.authToken());
     }
 
 

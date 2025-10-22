@@ -1,6 +1,7 @@
 package server.handlers;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import dataAccess.DataAccessException;
 import dataAccess.DuplicateNameException;
 import io.javalin.http.BadRequestResponse;
@@ -28,21 +29,29 @@ public class RegisterHandler implements Handler {
                 ctx.result(jsonString);
                 ctx.status(200);
 
-
-
         } catch (BadRequestResponse b) {
-            //If a bad request set it to 400
+            String errorJson = createJsonError("Error: bad request");
+            ctx.result(errorJson);
             ctx.status(400);
         }
         catch(DataAccessException e) {
+            String errorJson = createJsonError("Error: Data not stored");
+            ctx.result(errorJson);
             //If the data don't be accessin' set it to 500
             ctx.status(500);
         }
         catch(DuplicateNameException d) {
+            String errorJson = createJsonError("Error: already taken");
+            ctx.result(errorJson);
             //If the name is taken set it to 403
             ctx.status(403);
         }
 
+    }
 
+    public String createJsonError(String error) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("message", error);
+        return gson.toJson(jsonObject);
     }
 }
