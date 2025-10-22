@@ -22,6 +22,10 @@ public class MemoryGameDAO implements GameDAO{
     @Override
     public String listGames() {
         StringBuilder listOfGames = new StringBuilder();
+        GameData gameCheck = games.get(1);
+        if (gameCheck == null) {
+            return listOfGames.toString();
+        }
         for (int i = 1; i < id; i++) {
             GameData game = games.get(id);
             listOfGames.append(game.gameName()).append("\n");

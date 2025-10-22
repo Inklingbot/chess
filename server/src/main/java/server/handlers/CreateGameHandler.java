@@ -4,11 +4,15 @@ import com.google.gson.Gson;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;
+import service.GameService;
 import service.UserService;
 
 public class CreateGameHandler implements Handler {
+    public CreateGameHandler(GameService gameService) {
+        this.gameService = gameService;
+    }
     private final Gson gson = new Gson();
-    UserService userService;
+    GameService gameService;
     @Override
     public void handle(@NotNull Context ctx) throws Exception {
         //Create Request object from Json String

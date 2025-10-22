@@ -2,10 +2,7 @@ package server;
 
 import dataAccess.*;
 import io.javalin.*;
-import server.handlers.ClearGameHandler;
-import server.handlers.LogOutHandler;
-import server.handlers.LoginHandler;
-import server.handlers.RegisterHandler;
+import server.handlers.*;
 import service.GameService;
 import service.UserService;
 
@@ -28,13 +25,19 @@ public class Server {
         // Register your endpoints and exception handlers here.
         //Deletes all games
         javalin.delete("/db", context -> new ClearGameHandler(gameService).handle(context));
-
-
+        //Registers User
         javalin.post("/user", context -> new RegisterHandler(userService).handle(context));
-
+        //Login for a User
         javalin.post("/session", context -> new LoginHandler(userService).handle(context));
-
+        //Logout for a user
         javalin.delete("/session", context -> new LogOutHandler(userService).handle(context));
+        //List Games
+        javalin.get("/game", context -> new ListGamesHandler(gameService).handle(context));
+        //Create a Game
+        //TODO
+        javalin.post("/game", context -> new CreateGameHandler(gameService).handle(context));
+        //Join a Game
+        javalin.put("/game", context -> new JoinGameHandler(gameService).handle(context));
 
 
 

@@ -46,6 +46,9 @@ public class UserService {
         LoginResult result = null;
 
         UserData user = userDAO.getUser(request.username());
+        if (user == null) {
+            throw new UnauthorizedResponse("Error: unauthorized");
+        }
         if (Objects.equals(user.password(), request.password())) {
             AuthData newData = authDAO.createAuth(request.username());
             result = new LoginResult(newData.username(), newData.authToken());

@@ -1,28 +1,53 @@
 package server.handlers;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import dataAccess.DataAccessException;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
+import io.javalin.http.UnauthorizedResponse;
 import org.jetbrains.annotations.NotNull;
-import service.UserService;
+import service.GameService;
+import service.ListGamesRequest;
+import service.ListGamesResult;
+import service.LogoutRequest;
 
 public class ListGamesHandler implements Handler {
     private final Gson gson = new Gson();
-    UserService userService;
-    @Override
-    public void handle(@NotNull Context context) throws Exception {
-        //Try to get the AuthToken in the ListGamesRequest object
-
-        //Create a result class after doing logic in the Service Class
-
-        //Turn Result Class into jsonString
-
-        //Throw that in the result context
-
-        //If all goes well set status to 200
-
-        //If no authToken then set status to 401
-
-        //WHAT IS 500
+    public ListGamesHandler(GameService gameService) {
+        this.gameService = gameService;
     }
-}
+    GameService gameService;
+    @Override
+    public void handle(@NotNull Context ctx) throws Exception {
+        //Try to get the AuthToken in the ListGamesRequest object
+        try {
+            String authToken = ctx.header("Authorization");
+            if (authToken == null || authToken.isBlank()) {
+                throw new UnauthorizedResponse();
+            }
+            ListGamesRequest request = new ListGamesRequest(authToken);
+            ListGamesResult result = gameService.ListGames(request);
+            String jsonString = gson.toJson(result);
+            ctx.result(jsonString);
+            ctx.status(200);
+        }
+        catch (UnauthorizedResponse u) {
+            String errorJson = createJsonError("Error: unauthorized");
+            ctx.result(errorJson);
+            ctx.status(401);
+        }
+        catch(DataAccessException e) {
+            String errorJson = createJsonError("Error: Data not stored");
+            ctx.result(errorJson);
+            ctx.status(500);
+        }
+    }
+
+        public String createJsonError(String error) {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("message", error);
+            return gson.toJson(jsonObject);
+        }
+    }
+
