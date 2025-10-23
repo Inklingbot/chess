@@ -1,16 +1,9 @@
-package passoff.server.server;
-import chess.ChessGame;
+package service;
 import dataaccess.*;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.UnauthorizedResponse;
-import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
-import passoff.model.*;
-import service.*;
-
-import java.net.HttpURLConnection;
-import java.util.Locale;
 
 
 public class MyTests {
