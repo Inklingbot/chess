@@ -1,6 +1,4 @@
-package service;
-
-import chess.ChessGame;
+package model;
 
 public record CreateGameRequest(String authToken, String gameName) {
 

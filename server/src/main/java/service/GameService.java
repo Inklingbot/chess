@@ -3,8 +3,7 @@ package service;
 import dataaccess.*;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.UnauthorizedResponse;
-import model.AuthData;
-import model.GameData;
+import model.*;
 
 import java.util.Objects;
 

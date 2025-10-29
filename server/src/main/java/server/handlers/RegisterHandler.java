@@ -8,8 +8,8 @@ import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;
-import service.RegisterRequest;
-import service.RegisterResult;
+import model.RegisterRequest;
+import model.RegisterResult;
 import service.UserService;
 
 

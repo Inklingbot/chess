@@ -7,8 +7,8 @@ import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import io.javalin.http.UnauthorizedResponse;
 import org.jetbrains.annotations.NotNull;
-import service.LoginRequest;
-import service.LoginResult;
+import model.LoginRequest;
+import model.LoginResult;
 import service.UserService;
 
 public class LoginHandler implements Handler {

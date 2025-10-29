@@ -10,7 +10,7 @@ import io.javalin.http.Handler;
 import io.javalin.http.UnauthorizedResponse;
 import org.jetbrains.annotations.NotNull;
 import service.GameService;
-import service.JoinGameRequest;
+import model.JoinGameRequest;
 
 public class JoinGameHandler implements Handler {
     private final Gson gson = new Gson();

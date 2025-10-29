@@ -7,7 +7,7 @@ import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import io.javalin.http.UnauthorizedResponse;
 import org.jetbrains.annotations.NotNull;
-import service.LogoutRequest;
+import model.LogoutRequest;
 import service.UserService;
 
 public class LogOutHandler implements Handler {

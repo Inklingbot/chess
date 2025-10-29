@@ -6,8 +6,7 @@ import dataaccess.DuplicateNameException;
 import dataaccess.UserDAO;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.UnauthorizedResponse;
-import model.AuthData;
-import model.UserData;
+import model.*;
 
 import java.util.Objects;
 

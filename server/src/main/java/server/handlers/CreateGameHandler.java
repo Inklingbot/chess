@@ -7,6 +7,9 @@ import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import io.javalin.http.UnauthorizedResponse;
+import model.CreateGameNameRequest;
+import model.CreateGameRequest;
+import model.CreateGameResult;
 import org.jetbrains.annotations.NotNull;
 import service.*;
 
@@ -20,7 +23,7 @@ public class CreateGameHandler implements Handler {
     public void handle(@NotNull Context ctx) {
         try {String authToken = ctx.header("authorization");
             String gameName = ctx.body();
-            service.CreateGameNameRequest requestName = gson.fromJson(gameName, CreateGameNameRequest.class);
+            CreateGameNameRequest requestName = gson.fromJson(gameName, CreateGameNameRequest.class);
             CreateGameRequest request = new CreateGameRequest(authToken, requestName.gameName());
             CreateGameResult result = gameService.createGame(request);
             String jsonString = gson.toJson(result);

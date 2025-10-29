@@ -2,7 +2,7 @@ package service;
 import dataaccess.*;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.UnauthorizedResponse;
-import model.UserData;
+import model.*;
 import org.junit.jupiter.api.*;
 
 
