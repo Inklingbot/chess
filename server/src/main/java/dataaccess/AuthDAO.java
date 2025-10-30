@@ -2,6 +2,8 @@ package dataaccess;
 
 import model.AuthData;
 
+import java.sql.SQLException;
+
 public interface AuthDAO {
     void clear() throws DataAccessException;
 
@@ -9,6 +11,6 @@ public interface AuthDAO {
 
     AuthData getAuth(String authToken) throws DataAccessException;
 
-    void deleteAuth(String authToken) throws DataAccessException;
+    void deleteAuth(String authToken) throws DataAccessException, SQLException;
 
 }

@@ -1,14 +1,12 @@
 package service;
 
-import dataaccess.AuthDAO;
-import dataaccess.DataAccessException;
-import dataaccess.DuplicateNameException;
-import dataaccess.UserDAO;
+import dataaccess.*;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.UnauthorizedResponse;
 import model.*;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.sql.SQLException;
 import java.util.Objects;
 
 public class UserService {
@@ -66,8 +64,12 @@ public class UserService {
         if (data == null) {
             throw new UnauthorizedResponse("error: unauthorized");
         }
+        try {
+            authDAO.deleteAuth(request.authToken());
+        } catch (SQLException e) {
+            throw new ResponseException("Unable to configure database: %s");
+        }
 
-        authDAO.deleteAuth(request.authToken());
     }
 
 
