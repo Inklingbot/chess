@@ -21,9 +21,10 @@ public class SQLAuthDAO implements AuthDAO{
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
-        String writingStatement = "SELECT authToken, username FROM auth WHERE authToken = \"" + authToken + "\";";
+        String writingStatement = "SELECT authToken, username FROM auth WHERE authToken = ?;";
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement(writingStatement)) {
+                preparedStatement.setString(1, authToken);
                 ResultSet rs = preparedStatement.executeQuery();
                 if (rs.next()) {
                     String username = rs.getString(2);
@@ -40,9 +41,10 @@ public class SQLAuthDAO implements AuthDAO{
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
-        String writingStatement = "DELETE from auth WHERE authToken = \"" + authToken + "\";";
+        String writingStatement = "DELETE from auth WHERE authToken = ?;";
         try (var conn = DatabaseManager.getConnection()) {
             var preparedStatement = conn.prepareStatement(writingStatement);
+            preparedStatement.setString(1, authToken);
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
             throw new ResponseException(String.format("Unable to configure database: %s", ex.getNextException()));
@@ -63,9 +65,11 @@ public class SQLAuthDAO implements AuthDAO{
     private String writeAuthDataToDB(String username) throws DataAccessException {
         String newAuthToken = UUID.randomUUID().toString();
         String writingStatement = "INSERT INTO auth (authToken, username) " +
-                "VALUES (\"" + newAuthToken + "\", \"" + username + "\");";
+                "VALUES (?, ?);";
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement(writingStatement)) {
+                preparedStatement.setString(1, newAuthToken);
+                preparedStatement.setString(2, username);
                 preparedStatement.executeUpdate();
                 return newAuthToken;
             }

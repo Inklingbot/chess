@@ -25,9 +25,10 @@ public class SQLUserDAO implements UserDAO{
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
-        String writingStatement = "SELECT username, password, email FROM user WHERE username = \"" + username + "\";";
+        String writingStatement = "SELECT username, password, email FROM user WHERE username = ?;";
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement(writingStatement)) {
+                preparedStatement.setString(1, username);
                 ResultSet rs = preparedStatement.executeQuery();
                 if (rs.next()) {
                     String user = rs.getString(1);
@@ -66,10 +67,15 @@ public class SQLUserDAO implements UserDAO{
     }
 
     private void writeHashedPasswordToDatabase(String username, String hashedPassword, String email) throws DataAccessException {
+
         String writingStatement = "INSERT INTO user (username, password, email)" +
-                "VALUES (\"" + username + "\", \"" + hashedPassword + "\", \""  + email + "\");";
+                "VALUES (?, ?, ?);";
+
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement(writingStatement)) {
+                preparedStatement.setString(1, username);
+                preparedStatement.setString(2, hashedPassword);
+                preparedStatement.setString(3, email);
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException ex) {
