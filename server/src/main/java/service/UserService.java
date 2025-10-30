@@ -7,6 +7,7 @@ import dataaccess.UserDAO;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.UnauthorizedResponse;
 import model.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Objects;
 
@@ -48,7 +49,8 @@ public class UserService {
         if (user == null) {
             throw new UnauthorizedResponse("Error: unauthorized");
         }
-        if (Objects.equals(user.password(), request.password())) {
+
+        if (BCrypt.checkpw(request.password(), user.password())) {
             AuthData newData = authDAO.createAuth(request.username());
             result = new LoginResult(newData.username(), newData.authToken());
         }
