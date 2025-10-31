@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class SQLUserDAO implements UserDAO{
+
     @Override
     public void clear() throws DataAccessException {
         clearTable();

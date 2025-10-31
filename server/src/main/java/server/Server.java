@@ -13,7 +13,7 @@ public class Server {
 
     private final Javalin javalin;
     private AuthDAO authDAO = new SQLAuthDAO();
-    private GameDAO gameDAO = new MemoryGameDAO();
+    private GameDAO gameDAO = new SQLGameDAO();
     private UserDAO userDAO = new SQLUserDAO();
     private GameService gameService = new GameService(authDAO, gameDAO, userDAO);
     private UserService userService = new UserService(authDAO, userDAO);
