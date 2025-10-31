@@ -1,5 +1,6 @@
 package dataaccess;
 
+import io.javalin.http.BadRequestResponse;
 import model.AuthData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -35,7 +36,10 @@ public class SQLAuthDAO implements AuthDAO{
 
             }
         } catch (SQLException ex) {
-            throw new ResponseException(String.format("Unable to configure database: %s", ex.getNextException()));
+            throw new ResponseException(String.format("Error: Unable to configure database: %s", ex.getNextException()));
+        }
+        catch (DataAccessException d) {
+            throw new DataAccessException("Error: The server is not running!");
         }
     }
 
@@ -47,7 +51,10 @@ public class SQLAuthDAO implements AuthDAO{
             preparedStatement.setString(1, authToken);
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
-            throw new ResponseException(String.format("Unable to configure database: %s", ex.getNextException()));
+            throw new ResponseException(String.format("Error: Unable to configure database: %s", ex.getNextException()));
+        }
+        catch (DataAccessException d) {
+            throw new DataAccessException("Error: The server is not running!");
         }
     }
 
@@ -58,7 +65,10 @@ public class SQLAuthDAO implements AuthDAO{
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException ex) {
-            throw new ResponseException(String.format("Unable to configure database: %s", ex.getNextException()));
+            throw new ResponseException(String.format("Error: Unable to configure database: %s", ex.getNextException()));
+        }
+        catch (DataAccessException d) {
+            throw new DataAccessException("Error: The server is not running!");
         }
     }
 
@@ -74,7 +84,10 @@ public class SQLAuthDAO implements AuthDAO{
                 return newAuthToken;
             }
         } catch (SQLException ex) {
-            throw new ResponseException(String.format("Unable to configure database: %s", ex.getNextException()));
+            throw new ResponseException(String.format("Error: Unable to configure database: %s", ex.getNextException()));
+        }
+        catch (DataAccessException d) {
+            throw new DataAccessException("Error: The server is not running!");
         }
     }
 }

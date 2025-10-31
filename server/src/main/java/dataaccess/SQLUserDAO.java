@@ -1,5 +1,6 @@
 package dataaccess;
 
+import io.javalin.http.BadRequestResponse;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -43,7 +44,10 @@ public class SQLUserDAO implements UserDAO{
 
             }
         } catch (SQLException ex) {
-            throw new ResponseException(String.format("Unable to configure database: %s", ex.getNextException()));
+            throw new ResponseException(String.format("Error: Unable to configure database: %s", ex.getNextException()));
+        }
+        catch (DataAccessException d) {
+            throw new DataAccessException("Error: The server is not running!");
         }
     }
 
@@ -63,7 +67,10 @@ public class SQLUserDAO implements UserDAO{
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException ex) {
-            throw new ResponseException(String.format("Unable to configure database: %s", ex.getNextException()));
+            throw new ResponseException(String.format("Error: Unable to configure database: %s", ex.getNextException()));
+        }
+        catch (DataAccessException d) {
+            throw new DataAccessException("Error: The server is not running!");
         }
     }
 
@@ -80,7 +87,10 @@ public class SQLUserDAO implements UserDAO{
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException ex) {
-            throw new ResponseException(String.format("Unable to configure database: %s", ex.getNextException()));
+            throw new ResponseException(String.format("Error: Unable to configure database: %s", ex.getNextException()));
+        }
+        catch (DataAccessException d) {
+            throw new DataAccessException("Error: The server is not running!");
         }
     }
 

@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
+import io.javalin.http.BadRequestResponse;
 import model.GameData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,7 +25,10 @@ public class SQLGameDAO implements GameDAO{
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException ex) {
-            throw new ResponseException(String.format("Unable to configure database: %s", ex.getNextException()));
+            throw new ResponseException(String.format("Error: Unable to configure database: %s", ex.getNextException()));
+        }
+        catch (DataAccessException d) {
+            throw new DataAccessException("Error: The Server isn't running!");
         }
     }
 
@@ -52,7 +56,10 @@ public class SQLGameDAO implements GameDAO{
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException ex) {
-            throw new ResponseException(String.format("Unable to configure database: %s", ex.getNextException()));
+            throw new ResponseException(String.format("Error: Unable to configure database: %s", ex.getNextException()));
+        }
+        catch (DataAccessException d) {
+            throw new DataAccessException("Error: The server is not running!");
         }
     }
     //when deserializing we have to recreate all the pieces and stuff so it might get messy :skull emoji:
@@ -80,7 +87,10 @@ public class SQLGameDAO implements GameDAO{
             }
         }
         catch (SQLException ex) {
-            throw new ResponseException(String.format("Unable to configure database: %s", ex.getMessage()));
+            throw new ResponseException(String.format("Error: Unable to configure database: %s", ex.getMessage()));
+        }
+        catch (DataAccessException d) {
+            throw new DataAccessException("Error: The server is not running!");
         }
         return games;
     }
@@ -115,7 +125,10 @@ public class SQLGameDAO implements GameDAO{
 
             }
         } catch (SQLException e) {
-            throw new ResponseException("Unable to configure database" + e.getMessage());
+            throw new ResponseException("Error: Unable to configure database" + e.getMessage());
+        }
+        catch (DataAccessException d) {
+            throw new DataAccessException("Error: The server is not running!");
         }
 
     }
@@ -140,7 +153,10 @@ UPDATE game SET gameID = ?, whiteUsername = ?, blackUsername = ?,
             }
         }
         catch (SQLException ex) {
-            throw new ResponseException(String.format("Unable to configure database: %s", ex.getNextException()));
+            throw new ResponseException(String.format("Error: Unable to configure database: %s", ex.getNextException()));
+        }
+        catch (DataAccessException d) {
+            throw new DataAccessException("Error: The server is not running!");
         }
 
     }
@@ -165,7 +181,10 @@ UPDATE game SET gameID = ?, whiteUsername = ?, blackUsername = ?,
             }
         }
         catch (SQLException ex) {
-            throw new ResponseException(String.format("Unable to configure database: %s", ex.getMessage()));
+            throw new ResponseException(String.format("Error: Unable to configure database: %s", ex.getMessage()));
+        }
+        catch (DataAccessException d) {
+            throw new DataAccessException("Error: The server is not running!");
         }
     }
 
