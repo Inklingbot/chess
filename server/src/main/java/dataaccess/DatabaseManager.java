@@ -8,8 +8,8 @@ public class DatabaseManager {
     private static String dbUsername;
     private static String dbPassword;
     private static String connectionUrl;
-
-    private static final String[] createStatements = {
+    //this comment is purely to commit
+    private static final String[] CreateStatements = {
             """
             CREATE TABLE IF NOT EXISTS user (
             username VARCHAR(256),
@@ -112,7 +112,7 @@ public class DatabaseManager {
     public static void initializeTables() throws DataAccessException {
         DatabaseManager.createDatabase();
         try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : createStatements) {
+            for (var statement : CreateStatements) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }
