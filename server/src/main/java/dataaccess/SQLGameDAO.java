@@ -61,11 +61,31 @@ public class SQLGameDAO implements GameDAO{
     @Override
     public Collection<GameData> listGames() throws DataAccessException {
         Collection<GameData> games = new java.util.ArrayList<>(List.of());
-        for (int i = 1; i <= id; i++) {
-            games.add(getGame(i));
+
+        String statement = "SELECT * FROM game";
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparingStatement = conn.prepareStatement(statement)) {
+
+                ResultSet rs = preparingStatement.executeQuery();
+                while (rs.next()) {
+                    Integer gameID = rs.getInt("gameID");
+                    String jsonGame = rs.getString("chessGame");
+                    String gameName = rs.getString("gameName");
+                    String whiteUsername = rs.getString("whiteUsername");
+                    String blackUsername = rs.getString("blackUsername");
+                    ChessGame game = gson.fromJson(jsonGame, ChessGame.class);
+                    games.add(new GameData(gameID, whiteUsername, blackUsername, gameName, game));
+                }
+
+            }
+        }
+        catch (SQLException ex) {
+            throw new ResponseException(String.format("Unable to configure database: %s", ex.getMessage()));
         }
         return games;
     }
+
+
 
     @Override
     public void updateGameUserJoin(String color, String username, int gameID, GameData data) throws DataAccessException {
@@ -76,7 +96,6 @@ public class SQLGameDAO implements GameDAO{
 
                 ResultSet rs = preparedStatement.executeQuery();
                 if (rs.next()) {
-                    Integer id = Integer.parseInt(rs.getString(1));
                     String whitesUsername = rs.getString(2);
                     String blacksUsername = rs.getString(3);
                     String obtainedGameName = rs.getString(4);

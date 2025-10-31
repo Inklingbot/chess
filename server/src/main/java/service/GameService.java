@@ -7,6 +7,7 @@ import model.*;
 
 import java.util.Objects;
 
+@SuppressWarnings("FieldMayBeFinal")
 public class GameService {
     private AuthDAO authDAO;
     private GameDAO gameDAO;
