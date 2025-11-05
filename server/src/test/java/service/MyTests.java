@@ -133,7 +133,7 @@ public class MyTests {
     @Test
     @DisplayName("List Games Neg")
     public void listGameNegative() throws DataAccessException {
-        RegisterResult registerResult = userService.register(new RegisterRequest("me", "me", "me too"));
+        RegisterResult registerResult = userService.register(new RegisterRequest("me", "mypassword", "me too"));
         CreateGameRequest request = new CreateGameRequest(registerResult.authToken(), "myGame");
         gameService.createGame(request);
 
@@ -148,9 +148,9 @@ public class MyTests {
     @Test
     @DisplayName("Login Pos")
     public void loginPositive() throws DataAccessException {
-        RegisterResult registerResult = userService.register(new RegisterRequest("me", "me", "me too"));
+        RegisterResult registerResult = userService.register(new RegisterRequest("me", "myPassword", "me too"));
         Assertions.assertDoesNotThrow(() -> {
-            userService.login(new LoginRequest("me", "me"));
+            userService.login(new LoginRequest("me", "myPassword"));
         });
 
         gameService.clearGame();
@@ -159,10 +159,10 @@ public class MyTests {
     @Test
     @DisplayName("Login Neg")
     public void loginNegative() throws DataAccessException {
-        RegisterResult registerResult = userService.register(new RegisterRequest("me", "me", "me too"));
+        RegisterResult registerResult = userService.register(new RegisterRequest("me", "myPassword", "me too"));
 
         Assertions.assertThrows(UnauthorizedResponse.class, () -> {
-            userService.login(new LoginRequest("me", "ME?"));
+            userService.login(new LoginRequest("me", "Mehpassword"));
 
         });
 
@@ -172,8 +172,8 @@ public class MyTests {
     @Test
     @DisplayName("Logout Pos")
     public void logoutPositive() throws DataAccessException {
-        RegisterResult registerResult = userService.register(new RegisterRequest("me", "me", "me too"));
-        LoginResult result = userService.login(new LoginRequest("me", "me"));
+        RegisterResult registerResult = userService.register(new RegisterRequest("me", "myPassword", "me too"));
+        LoginResult result = userService.login(new LoginRequest("me", "myPassword"));
 
         Assertions.assertDoesNotThrow(() -> {
             userService.logout(new LogoutRequest(result.authToken()));
@@ -186,8 +186,8 @@ public class MyTests {
     @Test
     @DisplayName("Logout Neg")
     public void logoutNegative() throws DataAccessException {
-        RegisterResult registerResult = userService.register(new RegisterRequest("me", "me", "me too"));
-        LoginResult result = userService.login(new LoginRequest("me", "me"));
+        RegisterResult registerResult = userService.register(new RegisterRequest("me", "myPassword", "me too"));
+        LoginResult result = userService.login(new LoginRequest("me", "myPassword"));
 
         Assertions.assertThrows(UnauthorizedResponse.class, () -> {
             userService.logout(new LogoutRequest("This isn't the right AuthToken!"));
@@ -197,6 +197,8 @@ public class MyTests {
         gameService.clearGame();
 
     }
+
+
 
 
 
