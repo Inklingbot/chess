@@ -1,9 +1,12 @@
 package ui;
+import model.LoginResult;
+import model.RegisterResult;
+import server.ResponseException;
+import server.ServerFacade;
 import ui.EscapeSequences;
 
 import java.util.Arrays;
 import java.util.Scanner;
-
 
 import static ui.EscapeSequences.LOGO;
 import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
@@ -11,8 +14,9 @@ import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
 public class PreLoginUI {
 
     public void run() {
+        ServerFacade facade = new ServerFacade("DUMMY_STRING");
         System.out.println(LOGO + " Welcome to 240 chess. Type Help to get started.");
-        System.out.print(help());
+        System.out.print(help);
 
         Scanner scanner = new Scanner(System.in);
 
@@ -41,10 +45,10 @@ public class PreLoginUI {
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-                case "register" -> register(params);
+                case "register" -> register(params[1], params[2], params[3]);
                 case "quit" -> quit();
                 case "help" -> run();
-                case "login" -> login(params);
+                case "login" -> login(params[1], params[2]);
                 default -> run();
             };
         } catch (ResponseException ex) {
@@ -52,6 +56,31 @@ public class PreLoginUI {
             }
 
     }
+
+    public String register(String username, String pass, String email) {
+        RegisterResult result = facade.register(username, pass, email);
+
+        //call the appropriate class for this?
+
+        return result.toString();;
+    }
+
+    public String login(String username, String pass) {
+        LoginResult result = facade.login(username, pass);
+        return result.toString();
+    }
+
+
+
+    public String quit() {
+        //somehow quit the server?
+        return null;
+    }
+
+    public static final String register = """
+            please enter the following to create an account:
+            <USERNAME> <PASSWORD> <EMAIL>
+            """;
 
     public static final String help = """
             [38;5;12m register <USERNAME> <PASSWORD> <EMAIL> [38;5;0m - to create an account

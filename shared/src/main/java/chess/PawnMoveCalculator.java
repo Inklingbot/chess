@@ -26,12 +26,13 @@ public class PawnMoveCalculator extends PieceMoveCalculator {
 
         //Find piece color
         ChessGame.TeamColor pieceColor = piece.getTeamColor();
+        int row = position.getRow();
+        int column = position.getColumn();
 
         if (pieceColor == ChessGame.TeamColor.BLACK) {
             //Game Start Case
             boolean wasAdded = false;
-            int row = position.getRow();
-            int column = position.getColumn();
+
             if (row == 7) {
                 ChessPosition availSpace = new ChessPosition(row - 1, column);
                 if (addIfNull(availSpace, pieceMoves)) {
@@ -68,8 +69,6 @@ public class PawnMoveCalculator extends PieceMoveCalculator {
         if (pieceColor == ChessGame.TeamColor.WHITE) {
             //Game Start Case
             boolean wasAdded = false;
-            int row = position.getRow();
-            int column = position.getColumn();
             if (row == 2) {
 
                 ChessPosition availSpace = new ChessPosition(row + 1, column);
@@ -99,10 +98,7 @@ public class PawnMoveCalculator extends PieceMoveCalculator {
                 addIfNull(availSpace, pieceMoves);
             }
 
-
         }
-
-
         return pieceMoves;
     }
 
@@ -115,7 +111,6 @@ public class PawnMoveCalculator extends PieceMoveCalculator {
                 pieceMoves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.ROOK));
                 pieceMoves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.KNIGHT));
                 return true;
-                //Somehow call the pieceMoves method for the other piece, and then assign all to the pieceMoves collection
             }
             pieceMoves.add(new ChessMove(position, newPosition, null));
             return true;
@@ -134,7 +129,6 @@ public class PawnMoveCalculator extends PieceMoveCalculator {
                 pieceMoves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.ROOK));
                 pieceMoves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.KNIGHT));
                 return;
-                //Somehow call the pieceMoves method for the other piece, and then assign all to the pieceMoves collection
             }
             pieceMoves.add(new ChessMove(position, newPosition, null));
         }

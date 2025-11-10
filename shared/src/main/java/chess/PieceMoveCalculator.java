@@ -14,7 +14,6 @@ public abstract class PieceMoveCalculator {
             case ChessPiece.PieceType.ROOK:
                 return new RookMoveCalculator();
             case ChessPiece.PieceType.PAWN:
-
                 return new PawnMoveCalculator();
             case ChessPiece.PieceType.KING:
                 return new KingMoveCalculator();
