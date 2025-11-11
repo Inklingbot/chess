@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import model.*;
 
 import java.io.IOException;
+import java.io.*;
 import java.net.*;
 import java.net.http.*;
 import java.net.http.HttpRequest.BodyPublisher;
@@ -27,7 +28,7 @@ public class ServerFacade {
             RegisterRequest request = new RegisterRequest(username, pass, email);
             return this.makeRequest("POST", path, request, RegisterResult.class);
         } catch (ResponseException e) {
-            throw new ResponseException(500, e.getMessage());
+            throw new ResponseException(ResponseException.Code.ClientError, e.getMessage());
         }
     }
 
@@ -38,7 +39,7 @@ public class ServerFacade {
             return this.makeRequest("POST", path, request, LoginResult.class);
         }
         catch(ResponseException e) {
-            throw new ResponseException(500, e.getMessage());
+            throw new ResponseException(ResponseException.Code.ClientError, e.getMessage());
         }
     }
 
@@ -49,7 +50,7 @@ public class ServerFacade {
             return this.makeRequest("DELETE", path, request, CreateGameResult.class);
         }
         catch(ResponseException e) {
-            throw new ResponseException(500, e.getMessage());
+            throw new ResponseException(ResponseException.Code.ClientError, e.getMessage());
         }
     }
 
@@ -69,7 +70,7 @@ public class ServerFacade {
             return readBody(http, responseClass);
         }
         catch (Exception ex) {
-            throw new ResponseException(500, ex.getMessage());
+            throw new ResponseException(ResponseException.Code.ClientError, ex.getMessage());
         }
     }
 
@@ -86,7 +87,7 @@ public class ServerFacade {
     private void throwIfNotSuccessful (HttpURLConnection http) throws IOException, ResponseException {
         var status = http.getResponseCode();
         if (!isSuccessful(status)) {
-            throw new ResponseException(status, "failure: " + status);
+            throw new ResponseException(ResponseException.Code.ClientError, "failure: " + status);
         }
     }
 
@@ -96,10 +97,11 @@ public class ServerFacade {
             try (InputStream respBody = http.getInputStream()) {
                 InputStreamReader reader = new InputStreamReader(respBody);
                 if (responseClass != null) {
-                    response = new Gson().fromJson(reader, responseClass));
+                    response = new Gson().fromJson(reader, responseClass);
                 }
             }
         }
+        return response;
     }
 
     private boolean isSuccessful(int status) {

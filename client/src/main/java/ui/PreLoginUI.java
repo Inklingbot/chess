@@ -12,9 +12,10 @@ import static ui.EscapeSequences.LOGO;
 import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
 
 public class PreLoginUI {
-
+    ServerFacade facade = new ServerFacade("https://localhost:8080");
+    PostLoginUI loggedIn = new PostLoginUI(facade);
     public void run() {
-        ServerFacade facade = new ServerFacade("DUMMY_STRING");
+
         System.out.println(LOGO + " Welcome to 240 chess. Type Help to get started.");
         System.out.print(help);
 
@@ -47,9 +48,9 @@ public class PreLoginUI {
             return switch (cmd) {
                 case "register" -> register(params[1], params[2], params[3]);
                 case "quit" -> quit();
-                case "help" -> run();
+                case "help" -> "";
                 case "login" -> login(params[1], params[2]);
-                default -> run();
+                default -> "";
             };
         } catch (ResponseException ex) {
                 return ex.getMessage();
@@ -57,16 +58,17 @@ public class PreLoginUI {
 
     }
 
-    public String register(String username, String pass, String email) {
+    public String register(String username, String pass, String email) throws ResponseException {
         RegisterResult result = facade.register(username, pass, email);
 
         //call the appropriate class for this?
 
-        return result.toString();;
+        return result.toString();
     }
 
-    public String login(String username, String pass) {
+    public String login(String username, String pass) throws ResponseException {
         LoginResult result = facade.login(username, pass);
+
         return result.toString();
     }
 
@@ -93,8 +95,4 @@ public class PreLoginUI {
         System.out.print(help);
     }
 
-
-    public String help() {
-        return null;
-    }
 }

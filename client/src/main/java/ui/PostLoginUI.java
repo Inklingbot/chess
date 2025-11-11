@@ -12,9 +12,14 @@ import java.util.Scanner;
 import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
 
 public class PostLoginUI {
+    private ServerFacade facade;
+    public PostLoginUI(ServerFacade facade) {
+        this.facade = facade;
+    }
+
 
     public void run() {
-        ServerFacade facade = new ServerFacade("DUMMY_STRING");
+
         System.out.println(help);
 
         Scanner scanner = new Scanner(System.in);
@@ -47,8 +52,8 @@ public class PostLoginUI {
                 case "observe" -> observe(params[1]);
                 case "logout" -> logout();
                 case "quit" -> quit();
-                case "help" -> run();
-                default -> run();
+                case "help" -> "";
+                default -> "";
             };
         } catch (ResponseException ex) {
             return ex.getMessage();
@@ -56,15 +61,15 @@ public class PostLoginUI {
 
     }
 
-    CreateGameResult create(String name) {
+    String create(String name) throws ResponseException {
 
-        CreateGameResult result = facade.create(null, name);
+        CreateGameResult result = facade.create(name);
 
 
         return result.toString();
     }
 
-    ListGamesResult list() {
+    String list() {
         //call the appropriate class
         return null;
     }
