@@ -18,6 +18,7 @@ public class ServerFacade {
 
     private final String serverURL;
 
+
     public ServerFacade(String url) {
         serverURL = url;
     }
@@ -43,17 +44,68 @@ public class ServerFacade {
         }
     }
 
-    public CreateGameResult create(String name) throws ResponseException {
+    public CreateGameResult create(String name, String authToken) throws ResponseException {
         try{
-            var path = "/session";
+            var path = "/game";
             CreateGameNameRequest request = new CreateGameNameRequest(name);
-            return this.makeRequest("DELETE", path, request, CreateGameResult.class);
+            return this.makeRequest("POST", path, request, CreateGameResult.class);
         }
         catch(ResponseException e) {
             throw new ResponseException(ResponseException.Code.ClientError, e.getMessage());
         }
     }
 
+    public void join(String playerColor, String gameID, String authToken) throws ResponseException {
+        //TODO: find a way to get authToken
+        //TODO: find a way to make a request but not receive a response
+        Integer gameIDInt = Integer.valueOf(gameID);
+        try{
+            var path = "/game";
+            JoinGameRequest request = new JoinGameRequest(authToken, playerColor, gameIDInt);
+            this.makeRequest("PUT", path, request);
+        }
+        catch(ResponseException e) {
+            throw new ResponseException(ResponseException.Code.ClientError, e.getMessage());
+        }
+
+    }
+
+    public ListGamesResult list(String authToken) throws ResponseException {
+        try{
+            var path = "/game";
+            ListGamesRequest request = new ListGamesRequest(authToken);
+            return this.makeRequest("GET", path, request, ListGamesResult.class);
+        }
+        catch(ResponseException e) {
+            throw new ResponseException(ResponseException.Code.ClientError, e.getMessage());
+        }
+    }
+
+    public void logout(String authToken) throws ResponseException {
+        try {
+            var path = "/session";
+            LogoutRequest request = new LogoutRequest(authToken);
+            this.makeRequest("DELETE", path, request);
+        } catch (ResponseException e) {
+            throw new ResponseException(ResponseException.Code.ClientError, e.getMessage());
+        }
+    }
+
+    private void makeRequest(String method, String path, Object request) throws ResponseException {
+        try {
+            URL url = (new URI(serverURL + path)).toURL();
+            HttpURLConnection http = (HttpURLConnection) url.openConnection();
+            http.setRequestMethod(method);
+            http.setDoOutput(true);
+
+            writeBody(request, http);
+            http.connect();
+            throwIfNotSuccessful(http);
+        }
+        catch (Exception ex) {
+            throw new ResponseException(ResponseException.Code.ClientError, ex.getMessage());
+        }
+    }
 
 
 

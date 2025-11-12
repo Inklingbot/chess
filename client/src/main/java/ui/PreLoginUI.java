@@ -3,17 +3,14 @@ import model.LoginResult;
 import model.RegisterResult;
 import server.ResponseException;
 import server.ServerFacade;
-import ui.EscapeSequences;
 
 import java.util.Arrays;
 import java.util.Scanner;
 
-import static ui.EscapeSequences.LOGO;
-import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
+import static ui.EscapeSequences.*;
 
 public class PreLoginUI {
     ServerFacade facade = new ServerFacade("https://localhost:8080");
-    PostLoginUI loggedIn = new PostLoginUI(facade);
     public void run() {
 
         System.out.println(LOGO + " Welcome to 240 chess. Type Help to get started.");
@@ -29,7 +26,10 @@ public class PreLoginUI {
 
             try {
                 result = eval(line);
-                System.out.print(SET_TEXT_COLOR_BLUE + result);
+                if (!result.equals("quit")) {
+                    System.out.print(SET_TEXT_COLOR_BLUE + result);
+                }
+
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);
@@ -46,10 +46,10 @@ public class PreLoginUI {
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-                case "register" -> register(params[1], params[2], params[3]);
+                case "register" -> register(params[0], params[1], params[2]);
                 case "quit" -> quit();
                 case "help" -> "";
-                case "login" -> login(params[1], params[2]);
+                case "login" -> login(params[0], params[1]);
                 default -> "";
             };
         } catch (ResponseException ex) {
@@ -60,23 +60,29 @@ public class PreLoginUI {
 
     public String register(String username, String pass, String email) throws ResponseException {
         RegisterResult result = facade.register(username, pass, email);
-
+        //Store the username and authToken?
+        PostLoginUI ui = new PostLoginUI(facade, result.authToken());
+        ui.run();
         //call the appropriate class for this?
 
-        return result.toString();
+        return "Successfully Registered";
     }
 
     public String login(String username, String pass) throws ResponseException {
+        //Store the username and authToken?
         LoginResult result = facade.login(username, pass);
 
-        return result.toString();
+        PostLoginUI ui = new PostLoginUI(facade, result.authToken());
+        ui.run();
+        return "Thank you.";
     }
 
 
 
     public String quit() {
-        //somehow quit the server?
-        return null;
+
+        //Should do this on its own when the loop ends
+        return "quit";
     }
 
     public static final String register = """
@@ -84,12 +90,15 @@ public class PreLoginUI {
             <USERNAME> <PASSWORD> <EMAIL>
             """;
 
-    public static final String help = """
-            [38;5;12m register <USERNAME> <PASSWORD> <EMAIL> [38;5;0m - to create an account
-            [38;5;12m login <USERNAME> < PASSWORD> [38;5;0m - to play chess
-            [38;5;12m quit [38;5;0m - playing chess
-            [38;5;12m help [38;5;0m - see this screen again
-            """;
+
+
+    public static final String help = SET_TEXT_COLOR_BLUE + "register <USERNAME> <PASSWORD> <EMAIL>"
+            + SET_TEXT_COLOR_WHITE + " - to create an account \n"
+            + SET_TEXT_COLOR_BLUE + "login <USERNAME> < PASSWORD> "
+            + SET_TEXT_COLOR_WHITE + " - to play chess \n"
+            + SET_TEXT_COLOR_BLUE + "help "
+            + SET_TEXT_COLOR_WHITE + " - see this screen again \n"
+            + SET_TEXT_COLOR_BLUE + "quit\n";
 
     private void printPrompt() {
         System.out.print(help);
