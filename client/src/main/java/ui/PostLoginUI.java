@@ -22,8 +22,6 @@ public class PostLoginUI {
 
     public void run() {
 
-        System.out.println(help);
-
         Scanner scanner = new Scanner(System.in);
 
         var result = "";

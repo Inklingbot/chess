@@ -56,8 +56,6 @@ public class ServerFacade {
     }
 
     public void join(String playerColor, String gameID, String authToken) throws ResponseException {
-        //TODO: find a way to get authToken
-        //TODO: find a way to make a request but not receive a response
         Integer gameIDInt = Integer.valueOf(gameID);
         try{
             var path = "/game";

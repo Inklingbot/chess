@@ -10,11 +10,11 @@ import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
 public class PreLoginUI {
-    ServerFacade facade = new ServerFacade("https://localhost:8080");
+    ServerFacade facade = new ServerFacade("http://localhost:8080");
+
     public void run() {
 
         System.out.println(LOGO + " Welcome to 240 chess. Type Help to get started.");
-        System.out.print(help);
 
         Scanner scanner = new Scanner(System.in);
 
@@ -38,7 +38,6 @@ public class PreLoginUI {
 
         System.out.println();
     }
-
 
     public String eval(String input) {
         try {
@@ -69,15 +68,12 @@ public class PreLoginUI {
     }
 
     public String login(String username, String pass) throws ResponseException {
-        //Store the username and authToken?
         LoginResult result = facade.login(username, pass);
 
         PostLoginUI ui = new PostLoginUI(facade, result.authToken());
         ui.run();
         return "Thank you.";
     }
-
-
 
     public String quit() {
 
@@ -89,8 +85,6 @@ public class PreLoginUI {
             please enter the following to create an account:
             <USERNAME> <PASSWORD> <EMAIL>
             """;
-
-
 
     public static final String help = SET_TEXT_COLOR_BLUE + "register <USERNAME> <PASSWORD> <EMAIL>"
             + SET_TEXT_COLOR_WHITE + " - to create an account \n"
