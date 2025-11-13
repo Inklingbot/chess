@@ -47,7 +47,6 @@ public class PreLoginUI {
             return switch (cmd) {
                 case "register" -> register(params[0], params[1], params[2]);
                 case "quit" -> quit();
-                case "help" -> "";
                 case "login" -> login(params[0], params[1]);
                 default -> "";
             };
@@ -81,14 +80,10 @@ public class PreLoginUI {
         return "quit";
     }
 
-    public static final String register = """
-            please enter the following to create an account:
-            <USERNAME> <PASSWORD> <EMAIL>
-            """;
-
-    public static final String help = SET_TEXT_COLOR_BLUE + "register <USERNAME> <PASSWORD> <EMAIL>"
+    public static final String help =
+            SET_TEXT_COLOR_BLUE + "register <USERNAME> <PASSWORD> <EMAIL>"
             + SET_TEXT_COLOR_WHITE + " - to create an account \n"
-            + SET_TEXT_COLOR_BLUE + "login <USERNAME> < PASSWORD> "
+            + SET_TEXT_COLOR_BLUE + "login <USERNAME> <PASSWORD> "
             + SET_TEXT_COLOR_WHITE + " - to play chess \n"
             + SET_TEXT_COLOR_BLUE + "help "
             + SET_TEXT_COLOR_WHITE + " - see this screen again \n"

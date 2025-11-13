@@ -23,9 +23,8 @@ public class CreateGameHandler implements Handler {
     public void handle(@NotNull Context ctx) {
         try {String authToken = ctx.header("authorization");
             String gameName = ctx.body();
-            CreateGameNameRequest requestName = gson.fromJson(gameName, CreateGameNameRequest.class);
-            CreateGameRequest request = new CreateGameRequest(authToken, requestName.gameName());
-            CreateGameResult result = gameService.createGame(request);
+            CreateGameRequest request1 = gson.fromJson(gameName, CreateGameRequest.class);
+            CreateGameResult result = gameService.createGame(request1);
             String jsonString = gson.toJson(result);
             ctx.result(jsonString);
             ctx.status(200);

@@ -3,16 +3,12 @@ package server;
 import com.google.gson.Gson;
 import model.RegisterRequest;
 import model.RegisterResult;
-import com.google.gson.Gson;
 import model.*;
 
 import java.io.IOException;
 import java.io.*;
 import java.net.*;
 import java.net.http.*;
-import java.net.http.HttpRequest.BodyPublisher;
-import java.net.http.HttpRequest.BodyPublishers;
-import java.net.http.HttpResponse.BodyHandlers;
 
 public class ServerFacade {
 
@@ -47,7 +43,7 @@ public class ServerFacade {
     public CreateGameResult create(String name, String authToken) throws ResponseException {
         try{
             var path = "/game";
-            CreateGameNameRequest request = new CreateGameNameRequest(name);
+            CreateGameRequest request = new CreateGameRequest(authToken, name);
             return this.makeRequest("POST", path, request, CreateGameResult.class);
         }
         catch(ResponseException e) {
@@ -143,7 +139,7 @@ public class ServerFacade {
 
     private static <T> T readBody(HttpURLConnection http, Class<T> responseClass) throws IOException {
         T response = null;
-        if (http.getContentLength() < 0) {
+        if (http.getContentLength() > 0) {
             try (InputStream respBody = http.getInputStream()) {
                 InputStreamReader reader = new InputStreamReader(respBody);
                 if (responseClass != null) {
