@@ -30,21 +30,26 @@ public class RegisterHandler implements Handler {
                 ctx.status(200);
 
         } catch (BadRequestResponse b) {
-            String errorJson = createJsonError("Error: bad request");
+            String errorJson = createJsonError("Error: bad request\n");
             ctx.result(errorJson);
             ctx.status(400);
         }
         catch(DataAccessException e) {
-            String errorJson = createJsonError("Error: Data not stored");
+            String errorJson = createJsonError("Error: Data not stored\n");
             ctx.result(errorJson);
             //If the data don't be accessin' set it to 500
             ctx.status(500);
         }
         catch(DuplicateNameException d) {
-            String errorJson = createJsonError("Error: already taken");
+            String errorJson = createJsonError("Error: already taken\n");
             ctx.result(errorJson);
             //If the name is taken set it to 403
             ctx.status(403);
+        }
+        catch(ArrayIndexOutOfBoundsException a) {
+            String errorJson = createJsonError("You missed entering a field!\n");
+            ctx.result(errorJson);
+            ctx.status(500);
         }
 
     }

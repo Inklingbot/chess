@@ -20,7 +20,7 @@ public class ListGamesHandler implements Handler {
     public void handle(@NotNull Context ctx) throws Exception {
         //Try to get the AuthToken in the ListGamesRequest object
         try {
-            String authToken = ctx.header("Authorization");
+            String authToken = ctx.header("authorization");
             if (authToken == null || authToken.isBlank()) {
                 throw new UnauthorizedResponse();
             }
@@ -31,12 +31,12 @@ public class ListGamesHandler implements Handler {
             ctx.status(200);
         }
         catch (UnauthorizedResponse u) {
-            String errorJson = LogOutHandler.createJsonError(gson, "Error: unauthorized");
+            String errorJson = LogOutHandler.createJsonError(gson, "Error: unauthorized\n");
             ctx.result(errorJson);
             ctx.status(401);
         }
         catch(DataAccessException e) {
-            String errorJson = LogOutHandler.createJsonError(gson, "Error: Data not stored");
+            String errorJson = LogOutHandler.createJsonError(gson, "Error: Data not stored\n");
             ctx.result(errorJson);
             ctx.status(500);
         }
