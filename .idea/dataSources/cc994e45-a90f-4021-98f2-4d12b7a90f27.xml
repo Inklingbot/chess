@@ -998,7 +998,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     <schema id="288" parent="1" name="chess">
       <AutoIntrospectionLevel>3</AutoIntrospectionLevel>
       <LastIntrospectionLevel>3</LastIntrospectionLevel>
-      <LastIntrospectionLocalTimestamp>2025-11-14.17:19:14</LastIntrospectionLocalTimestamp>
+      <LastIntrospectionLocalTimestamp>2025-11-14.22:47:04</LastIntrospectionLocalTimestamp>
       <CollationName>utf8mb4_0900_ai_ci</CollationName>
     </schema>
     <schema id="289" parent="1" name="information_schema">
@@ -1034,72 +1034,5 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
     <user id="298" parent="1" name="root">
       <Host>localhost</Host>
     </user>
-    <table id="299" parent="288" name="auth">
-      <DetailsLevel>3</DetailsLevel>
-      <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_0900_ai_ci</CollationName>
-    </table>
-    <table id="300" parent="288" name="game">
-      <DetailsLevel>3</DetailsLevel>
-      <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_0900_ai_ci</CollationName>
-    </table>
-    <table id="301" parent="288" name="user">
-      <DetailsLevel>3</DetailsLevel>
-      <Engine>InnoDB</Engine>
-      <CollationName>utf8mb4_0900_ai_ci</CollationName>
-    </table>
-    <column id="302" parent="299" name="authToken">
-      <Position>1</Position>
-      <StoredType>longtext|0s</StoredType>
-    </column>
-    <column id="303" parent="299" name="username">
-      <Position>2</Position>
-      <StoredType>longtext|0s</StoredType>
-    </column>
-    <column id="304" parent="300" name="gameID">
-      <AutoIncrement>1</AutoIncrement>
-      <NotNull>1</NotNull>
-      <Position>1</Position>
-      <StoredType>int|0s</StoredType>
-    </column>
-    <column id="305" parent="300" name="whiteUsername">
-      <Position>2</Position>
-      <StoredType>varchar(20)|0s</StoredType>
-    </column>
-    <column id="306" parent="300" name="blackUsername">
-      <Position>3</Position>
-      <StoredType>varchar(20)|0s</StoredType>
-    </column>
-    <column id="307" parent="300" name="gameName">
-      <Position>4</Position>
-      <StoredType>varchar(20)|0s</StoredType>
-    </column>
-    <column id="308" parent="300" name="chessGame">
-      <Position>5</Position>
-      <StoredType>longtext|0s</StoredType>
-    </column>
-    <index id="309" parent="300" name="PRIMARY">
-      <ColNames>gameID</ColNames>
-      <Type>btree</Type>
-      <Unique>1</Unique>
-    </index>
-    <key id="310" parent="300" name="PRIMARY">
-      <NameSurrogate>1</NameSurrogate>
-      <Primary>1</Primary>
-      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
-    </key>
-    <column id="311" parent="301" name="username">
-      <Position>1</Position>
-      <StoredType>varchar(256)|0s</StoredType>
-    </column>
-    <column id="312" parent="301" name="password">
-      <Position>2</Position>
-      <StoredType>longtext|0s</StoredType>
-    </column>
-    <column id="313" parent="301" name="email">
-      <Position>3</Position>
-      <StoredType>varchar(256)|0s</StoredType>
-    </column>
   </database-model>
 </dataSource>

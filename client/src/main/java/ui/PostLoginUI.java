@@ -1,16 +1,22 @@
 package ui;
 import model.CreateGameResult;
+import model.GameData;
 import model.ListGamesResult;
 import server.ResponseException;
 import server.ServerFacade;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
 
+//error catching in
+//don't use user input as gameID for join, use a hashmap
+
 public class PostLoginUI {
+    public HashMap<Integer, Integer> ids = new HashMap<>();
     private final ServerFacade facade;
     private final String authToken;
     public PostLoginUI(ServerFacade facade, String authToken) {
@@ -33,6 +39,7 @@ public class PostLoginUI {
                 leave = true;
             }
             try {
+                var list = list();
                 result = eval(line);
                 if (result != null) {
                     System.out.print(SET_TEXT_COLOR_BLUE + result);
@@ -41,12 +48,16 @@ public class PostLoginUI {
                     break;
                 }
 
-            } catch (Throwable e) {
+            }
+            catch(NumberFormatException n) {
+                System.out.println("Please use the format \" 1 \" for the game number.");
+            }
+            catch (Throwable e) {
                 var msg = e.toString();
                 String[] msgs = msg.split(":");
                 for (int i = 1; i < msgs.length; i++)  {
                     System.out.println(msgs[i]);
-                    System.out.println(msg);
+//                    System.out.println(msg);
                 }
 
             }
@@ -60,14 +71,22 @@ public class PostLoginUI {
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             if (Objects.equals(cmd, "create") || Objects.equals(cmd, "observe")) {
                 if (params.length < 1) {
-                    throw new ResponseException(ResponseException.Code.ClientError,
+                    throw new ResponseException(
                             "You missed a field somewhere, check your syntax!\n");
+                }
+                if (params.length > 1) {
+                    throw new ResponseException(
+                            "Too many fields given!\n");
                 }
             }
             else if (Objects.equals(cmd, "join")) {
                 if (params.length < 2) {
-                    throw new ResponseException(ResponseException.Code.ClientError,
+                    throw new ResponseException(
                             "You missed a field somewhere, check your syntax!\n");
+                }
+                if (params.length > 2) {
+                    throw new ResponseException(
+                            "Too many fields given!\n");
                 }
             }
             return switch (cmd) {
@@ -85,16 +104,33 @@ public class PostLoginUI {
 
     String create(String name) throws ResponseException {
         CreateGameResult result = facade.create(name, authToken);
-        return result.toString() + "\n";
+        return  "Successfully created the game!\n";
     }
 
     String list() throws ResponseException {
         ListGamesResult result = facade.list(authToken);
-        return result.toString() + "\n";
+        int publicId = 1;
+        StringBuilder builda = new StringBuilder();
+        builda.append("List of Games: \n");
+        for (GameData game : result.games()) {
+            ids.put(publicId, game.gameID());
+            builda.append(publicId).append(" Game Name: ").append(game.gameName()).append(", White: ").append(game.whiteUsername()).append(", Black: ").append(game.blackUsername()).append("\n");
+            publicId++;
+        }
+        return builda.toString();
     }
 
     public String join(String gameID, String playerColor) throws ResponseException {
-        facade.join(playerColor, gameID, authToken);
+        Integer gameIDInt = Integer.valueOf(gameID);
+
+        if (!(gameIDInt > ids.size())) {
+            String gameIDDb = ids.get(gameIDInt).toString();
+            facade.join(playerColor, gameIDDb, authToken);
+        }
+        else {
+            throw new ResponseException("This is not a valid gameID!");
+        }
+
 
         //display the board (starting state)
         if (Objects.equals(playerColor, "white")) {
@@ -139,6 +175,7 @@ public class PostLoginUI {
                  SET_TEXT_COLOR_MAGENTA + "quit " + SET_TEXT_COLOR_WHITE + "- quit the program altogether\n" +
                  SET_TEXT_COLOR_MAGENTA + "help " + SET_TEXT_COLOR_WHITE + "- display this screen\n";
 
+
     public static final String BOARD_INITIAL = SET_BG_COLOR_DARK_GREY + "  a   b  c   d   e   f  g  h" + EMPTY +
             "\n" + "8" + SET_BG_COLOR_WHITE + SET_TEXT_COLOR_RED
             + BLACK_ROOK + SET_BG_COLOR_BLACK + BLACK_KNIGHT + SET_BG_COLOR_WHITE + BLACK_BISHOP + SET_BG_COLOR_BLACK
@@ -171,36 +208,36 @@ public class PostLoginUI {
 
 
     public static final String BOARD_INITIAL_2 = SET_BG_COLOR_DARK_GREY + "  a   b  c   d   e   f  g  h" + EMPTY +
-            "\n" + "8" + SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLUE
+            "\n" + "1" + SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLUE
             + BLACK_ROOK + SET_BG_COLOR_BLACK + BLACK_KNIGHT + SET_BG_COLOR_WHITE + BLACK_BISHOP + SET_BG_COLOR_BLACK
             + BLACK_KING + SET_BG_COLOR_WHITE + BLACK_QUEEN + SET_BG_COLOR_BLACK + BLACK_BISHOP + SET_BG_COLOR_WHITE
-            + BLACK_KNIGHT + SET_BG_COLOR_BLACK + BLACK_ROOK + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "8\n7"
+            + BLACK_KNIGHT + SET_BG_COLOR_BLACK + BLACK_ROOK + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "1\n2"
             + SET_TEXT_COLOR_BLUE + SET_BG_COLOR_BLACK
             + BLACK_PAWN + SET_BG_COLOR_WHITE + BLACK_PAWN + SET_BG_COLOR_BLACK + BLACK_PAWN + SET_BG_COLOR_WHITE
             + BLACK_PAWN + SET_BG_COLOR_BLACK + BLACK_PAWN + SET_BG_COLOR_WHITE + BLACK_PAWN + SET_BG_COLOR_BLACK
-            + BLACK_PAWN + SET_BG_COLOR_WHITE + BLACK_PAWN + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "7\n6"
+            + BLACK_PAWN + SET_BG_COLOR_WHITE + BLACK_PAWN + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "2\n3"
             + SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLUE
             + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY
             + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK
-            + EMPTY + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "6\n5" + SET_TEXT_COLOR_BLUE + SET_BG_COLOR_BLACK
+            + EMPTY + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "3\n4" + SET_TEXT_COLOR_BLUE + SET_BG_COLOR_BLACK
             + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY
             + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE
-            + EMPTY + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "5\n4" + SET_TEXT_COLOR_BLUE + SET_BG_COLOR_WHITE
+            + EMPTY + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "4\n5" + SET_TEXT_COLOR_BLUE + SET_BG_COLOR_WHITE
             + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY
             + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK
-            + EMPTY + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "4\n3" + SET_TEXT_COLOR_RED + SET_BG_COLOR_BLACK
+            + EMPTY + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "5\n6" + SET_TEXT_COLOR_RED + SET_BG_COLOR_BLACK
             + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY
             + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE
-            + EMPTY + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "3\n2" + SET_BG_COLOR_WHITE + WHITE_PAWN
-            + SET_BG_COLOR_BLACK + SET_TEXT_COLOR_RED
+            + EMPTY + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "6\n7" + SET_BG_COLOR_WHITE + WHITE_PAWN
+            + SET_TEXT_COLOR_RED + SET_BG_COLOR_BLACK
             + WHITE_PAWN + SET_BG_COLOR_WHITE + WHITE_PAWN + SET_BG_COLOR_BLACK + WHITE_PAWN +SET_BG_COLOR_WHITE
             + WHITE_PAWN + SET_BG_COLOR_BLACK + WHITE_PAWN +SET_BG_COLOR_WHITE + WHITE_PAWN + SET_BG_COLOR_BLACK
-            + WHITE_PAWN + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "2\n1" + SET_TEXT_COLOR_RED
+            + WHITE_PAWN + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "7\n8" + SET_TEXT_COLOR_RED
             + SET_BG_COLOR_BLACK + WHITE_ROOK + SET_BG_COLOR_WHITE
             + WHITE_KNIGHT + SET_BG_COLOR_BLACK + WHITE_BISHOP + SET_BG_COLOR_WHITE + WHITE_KING + SET_BG_COLOR_BLACK
             + WHITE_QUEEN + SET_BG_COLOR_WHITE + WHITE_BISHOP + SET_BG_COLOR_BLACK + WHITE_KNIGHT + SET_BG_COLOR_WHITE
             + WHITE_ROOK + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE
-            +  "1\n" + "  a   b  c   d   e  f   g  h" + EMPTY + "\n";
+            +  "8\n" + "  a   b  c   d   e  f   g  h" + EMPTY + "\n";
 
 
 

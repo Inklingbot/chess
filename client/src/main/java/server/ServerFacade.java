@@ -8,7 +8,6 @@ import model.*;
 import java.io.IOException;
 import java.io.*;
 import java.net.*;
-import java.net.http.*;
 
 public class ServerFacade {
 
@@ -26,7 +25,7 @@ public class ServerFacade {
             RegisterRequest request = new RegisterRequest(username, pass, email);
             return this.makeRequest("POST", path, request, RegisterResult.class, null);
         } catch (ResponseException e) {
-            throw new ResponseException(ResponseException.Code.ClientError, e.getMessage());
+            throw new ResponseException(e.getMessage());
         }
     }
 
@@ -37,7 +36,7 @@ public class ServerFacade {
             return this.makeRequest("POST", path, request, LoginResult.class, null);
         }
         catch(ResponseException e) {
-            throw new ResponseException(ResponseException.Code.ClientError, e.getMessage());
+            throw new ResponseException(e.getMessage());
         }
     }
 
@@ -48,7 +47,7 @@ public class ServerFacade {
             return this.makeRequest("POST", path, request, CreateGameResult.class, authToken);
         }
         catch(ResponseException e) {
-            throw new ResponseException(ResponseException.Code.ClientError, e.getMessage());
+            throw new ResponseException(e.getMessage());
         }
     }
 
@@ -60,7 +59,7 @@ public class ServerFacade {
             this.makeRequest("PUT", path, request, authToken);
         }
         catch(ResponseException e) {
-            throw new ResponseException(ResponseException.Code.ClientError, e.getMessage());
+            throw new ResponseException("You input the wrong Color!");
         }
 
     }
@@ -72,7 +71,7 @@ public class ServerFacade {
             return this.makeRequest("GET", path, null, ListGamesResult.class, authToken);
         }
         catch(ResponseException e) {
-            throw new ResponseException(ResponseException.Code.ClientError, e.getMessage());
+            throw new ResponseException(e.getMessage());
         }
     }
 
@@ -82,7 +81,7 @@ public class ServerFacade {
             LogoutRequest request = new LogoutRequest(authToken);
             this.makeRequest("DELETE", path, request, authToken);
         } catch (ResponseException e) {
-            throw new ResponseException(ResponseException.Code.ClientError, e.getMessage());
+            throw new ResponseException(e.getMessage());
         }
     }
 
@@ -101,7 +100,7 @@ public class ServerFacade {
             throwIfNotSuccessful(http);
         }
         catch (Exception ex) {
-            throw new ResponseException(ResponseException.Code.ClientError, ex.getMessage());
+            throw new ResponseException(ex.getMessage());
         }
     }
 
@@ -123,7 +122,7 @@ public class ServerFacade {
             return readBody(http, responseClass);
         }
         catch (Exception ex) {
-            throw new ResponseException(ResponseException.Code.ClientError, ex.getMessage());
+            throw new ResponseException(ex.getMessage());
         }
     }
 
@@ -140,7 +139,7 @@ public class ServerFacade {
     private void throwIfNotSuccessful (HttpURLConnection http) throws IOException, ResponseException {
         var status = http.getResponseCode();
         if (!isSuccessful(status)) {
-            throw new ResponseException(ResponseException.Code.ClientError, "failure: " + status);
+            throw new ResponseException("failure: " + status);
         }
     }
 

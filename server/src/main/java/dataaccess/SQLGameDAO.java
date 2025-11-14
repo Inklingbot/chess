@@ -106,7 +106,7 @@ public class SQLGameDAO implements GameDAO{
     @Override
     public void updateGameUserJoin(String color, String username, int gameID, GameData data) throws DataAccessException {
         String statement = "SELECT gameID, whiteUsername, blackUsername, gameName, chessGame FROM game WHERE gameID = " + "?;";
-
+        String deleteStatement = "DELETE FROM game WHERE gameID = " + "?;";
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setInt(1, gameID);
@@ -117,15 +117,16 @@ public class SQLGameDAO implements GameDAO{
                     String obtainedGameName = rs.getString(4);
                     String obtainedJSONString = rs.getString(5);
 
-                    if (Objects.equals(color, "BLACK")) {
+                    if (Objects.equals(color.toUpperCase(), "BLACK")) {
                         blacksUsername = username;
                         insertColorName(whitesUsername, blacksUsername, gameID, obtainedJSONString, obtainedGameName);
                     }
-                    else if (Objects.equals(color, "WHITE")) {
+                    else if (Objects.equals(color.toUpperCase(), "WHITE")) {
                         whitesUsername = username;
                         insertColorName(whitesUsername, blacksUsername, gameID, obtainedJSONString, obtainedGameName);
                     }
                 }
+
 
 
 
@@ -141,17 +142,14 @@ public class SQLGameDAO implements GameDAO{
 
     public void insertColorName (String whitesUsername, String blacksUsername, int gameID, String data, String gameName)
             throws DataAccessException {
-                String writingStatement = "UPDATE game SET whiteUsername = ?, blackUsername = ?, " +
-                        "gameName = ?, chessGame = ? WHERE gameID = ?;";
+                String writingStatement = "UPDATE game SET whiteUsername = ?, blackUsername = ? WHERE gameID = ?;";
 
 
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparingStatement = conn.prepareStatement(writingStatement)) {
+                preparingStatement.setInt(3, gameID);
                 preparingStatement.setString(1, whitesUsername);
                 preparingStatement.setString(2, blacksUsername);
-                preparingStatement.setString(3, gameName);
-                preparingStatement.setString(4, data);
-                preparingStatement.setInt(5, gameID);
 
                 preparingStatement.executeUpdate();
             }

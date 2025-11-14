@@ -47,13 +47,13 @@ public class PreLoginUI {
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
         if (Objects.equals(cmd, "register")) {
             if (params.length < 3) {
-                throw new ResponseException(ResponseException.Code.ClientError,
+                throw new ResponseException(
                         "You missed a field somewhere, check your syntax!\n");
             }
         }
         if (Objects.equals(cmd, "login")) {
             if (params.length < 2) {
-                throw new ResponseException(ResponseException.Code.ClientError,
+                throw new ResponseException(
                         "You missed a field somewhere, check your syntax!\n");
             }
         }
@@ -81,6 +81,7 @@ public class PreLoginUI {
         LoginResult result = facade.login(username, pass);
 
         PostLoginUI ui = new PostLoginUI(facade, result.authToken());
+        System.out.println(SET_TEXT_COLOR_YELLOW + "You're logged in!");
         ui.run();
         return SET_TEXT_COLOR_YELLOW + "Thank you.\n";
     }

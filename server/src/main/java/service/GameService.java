@@ -42,7 +42,7 @@ public class GameService {
             if (authData == null) {
                 throw new UnauthorizedResponse("error: unauthorized");
             }
-                gameDAO.updateGameUserJoin(request.playerColor(), authData.username(), request.gameID(), gameDAO.getGame(request.gameID()));
+                gameDAO.updateGameUserJoin(request.playerColor(), authData.username(), request.gameID(), data);
 
         } else {
             throw new DuplicateNameException("Error: already taken");
