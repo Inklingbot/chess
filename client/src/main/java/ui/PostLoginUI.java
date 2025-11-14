@@ -6,6 +6,7 @@ import server.ServerFacade;
 import ui.EscapeSequences.*;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -40,11 +41,22 @@ public class PostLoginUI {
         System.out.println();
     }
 
-    public String eval(String input) {
-        try {
+    public String eval(String input) throws ResponseException {
             String[] tokens = input.toLowerCase().split(" ");
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
+            if (Objects.equals(cmd, "create") || Objects.equals(cmd, "observe")) {
+                if (params.length < 1) {
+                    throw new ResponseException(ResponseException.Code.ClientError,
+                            "You missed a field somewhere, check your syntax!\n");
+                }
+            }
+            else if (Objects.equals(cmd, "join")) {
+                if (params.length < 2) {
+                    throw new ResponseException(ResponseException.Code.ClientError,
+                            "You missed a field somewhere, check your syntax!\n");
+                }
+            }
             return switch (cmd) {
                 case "create" -> create(params[0]);
                 case  "list" -> list();
@@ -54,9 +66,7 @@ public class PostLoginUI {
                 case "quit" -> quit();
                 default -> "";
             };
-        } catch (ResponseException ex) {
-            return ex.getMessage();
-        }
+
 
     }
 
@@ -108,25 +118,28 @@ public class PostLoginUI {
                  SET_TEXT_COLOR_MAGENTA + "help " + SET_TEXT_COLOR_WHITE + "- display this screen\n";
 
     public static final String boardInitial = SET_BG_COLOR_DARK_GREY + "  a   b  c   d   e   f  g  h" + EMPTY +
-            "\n" + "8" + SET_BG_COLOR_WHITE
+            "\n" + "8" + SET_BG_COLOR_WHITE + SET_TEXT_COLOR_RED
             + BLACK_ROOK + SET_BG_COLOR_BLACK + BLACK_KNIGHT + SET_BG_COLOR_WHITE + BLACK_BISHOP + SET_BG_COLOR_BLACK
             + BLACK_QUEEN + SET_BG_COLOR_WHITE + BLACK_KING + SET_BG_COLOR_BLACK + BLACK_BISHOP + SET_BG_COLOR_WHITE
-            + BLACK_KNIGHT + SET_BG_COLOR_BLACK + BLACK_ROOK + SET_BG_COLOR_DARK_GREY + "8\n7" + SET_BG_COLOR_BLACK
+            + BLACK_KNIGHT + SET_BG_COLOR_BLACK + BLACK_ROOK + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "8\n7"
+            + SET_TEXT_COLOR_RED + SET_BG_COLOR_BLACK
             + BLACK_PAWN + SET_BG_COLOR_WHITE + BLACK_PAWN + SET_BG_COLOR_BLACK + BLACK_PAWN + SET_BG_COLOR_WHITE
             + BLACK_PAWN + SET_BG_COLOR_BLACK + BLACK_PAWN + SET_BG_COLOR_WHITE + BLACK_PAWN + SET_BG_COLOR_BLACK
-            + BLACK_PAWN + SET_BG_COLOR_WHITE + BLACK_PAWN + SET_BG_COLOR_DARK_GREY + "7\n6" + SET_BG_COLOR_WHITE
+            + BLACK_PAWN + SET_BG_COLOR_WHITE + BLACK_PAWN + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "7\n6"
+            + SET_BG_COLOR_WHITE + SET_TEXT_COLOR_RED
             + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY
             + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK
-            + EMPTY + SET_BG_COLOR_DARK_GREY + "6\n5" + SET_BG_COLOR_BLACK
+            + EMPTY + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "6\n5" + SET_TEXT_COLOR_RED + SET_BG_COLOR_BLACK
             + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY
             + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE
-            + EMPTY + SET_BG_COLOR_DARK_GREY + "5\n4" + SET_BG_COLOR_WHITE
+            + EMPTY + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "5\n4" + SET_TEXT_COLOR_RED + SET_BG_COLOR_WHITE
             + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY
             + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK
-            + EMPTY + SET_BG_COLOR_DARK_GREY + "4\n3" + SET_BG_COLOR_BLACK
+            + EMPTY + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "4\n3" + SET_TEXT_COLOR_RED + SET_BG_COLOR_BLACK
             + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY
             + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE
-            + EMPTY + SET_BG_COLOR_DARK_GREY + "3\n2" + SET_BG_COLOR_WHITE + WHITE_PAWN + SET_BG_COLOR_BLACK
+            + EMPTY + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "3\n2" + SET_BG_COLOR_WHITE + WHITE_PAWN
+            + SET_BG_COLOR_BLACK
             + WHITE_PAWN + SET_BG_COLOR_WHITE + WHITE_PAWN + SET_BG_COLOR_BLACK + WHITE_PAWN +SET_BG_COLOR_WHITE
             + WHITE_PAWN + SET_BG_COLOR_BLACK + WHITE_PAWN +SET_BG_COLOR_WHITE + WHITE_PAWN + SET_BG_COLOR_BLACK
             + WHITE_PAWN + SET_BG_COLOR_DARK_GREY + "2\n1" + SET_BG_COLOR_BLACK + WHITE_ROOK + SET_BG_COLOR_WHITE

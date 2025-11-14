@@ -10,6 +10,7 @@ import io.javalin.http.UnauthorizedResponse;
 import model.CreateGameNameRequest;
 import model.CreateGameRequest;
 import model.CreateGameResult;
+import model.JoinGameRequest;
 import org.jetbrains.annotations.NotNull;
 import service.*;
 
@@ -24,7 +25,8 @@ public class CreateGameHandler implements Handler {
         try {String authToken = ctx.header("authorization");
             String gameName = ctx.body();
             CreateGameRequest request1 = gson.fromJson(gameName, CreateGameRequest.class);
-            CreateGameResult result = gameService.createGame(request1);
+            CreateGameRequest finishedRequest = new CreateGameRequest(authToken, request1.gameName());
+            CreateGameResult result = gameService.createGame(finishedRequest);
             String jsonString = gson.toJson(result);
             ctx.result(jsonString);
             ctx.status(200);

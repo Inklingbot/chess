@@ -5,6 +5,7 @@ import server.ResponseException;
 import server.ServerFacade;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -32,27 +33,37 @@ public class PreLoginUI {
 
             } catch (Throwable e) {
                 var msg = e.toString();
-                System.out.print(msg);
+                String[] msgs = msg.split(":");
+                System.out.print(msgs[1]);
+                System.out.print(msg + "\n");
             }
         }
 
         System.out.println();
     }
 
-    public String eval(String input) {
-        try {
+    public String eval(String input) throws ResponseException {
             String[] tokens = input.toLowerCase().split(" ");
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
+        if (Objects.equals(cmd, "register")) {
+            if (params.length < 3) {
+                throw new ResponseException(ResponseException.Code.ClientError,
+                        "You missed a field somewhere, check your syntax!\n");
+            }
+        }
+        if (Objects.equals(cmd, "login")) {
+            if (params.length < 2) {
+                throw new ResponseException(ResponseException.Code.ClientError,
+                        "You missed a field somewhere, check your syntax!\n");
+            }
+        }
             return switch (cmd) {
                 case "register" -> register(params[0], params[1], params[2]);
                 case "quit" -> quit();
                 case "login" -> login(params[0], params[1]);
                 default -> "";
             };
-        } catch (ResponseException ex) {
-                return ex.getMessage();
-            }
 
     }
 

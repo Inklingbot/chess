@@ -12,6 +12,8 @@ import java.net.http.*;
 
 public class ServerFacade {
 
+    //TODO: First, figure out how to keep the ID numbers constant when server is restarted
+    //TODO: Create the board drawing
     private final String serverURL;
 
 
