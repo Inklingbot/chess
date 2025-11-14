@@ -46,6 +46,7 @@ public class PostLoginUI {
                 String[] msgs = msg.split(":");
                 for (int i = 1; i < msgs.length; i++)  {
                     System.out.println(msgs[i]);
+                    System.out.println(msg);
                 }
 
             }
@@ -84,12 +85,12 @@ public class PostLoginUI {
 
     String create(String name) throws ResponseException {
         CreateGameResult result = facade.create(name, authToken);
-        return result.toString();
+        return result.toString() + "\n";
     }
 
     String list() throws ResponseException {
         ListGamesResult result = facade.list(authToken);
-        return result.toString();
+        return result.toString() + "\n";
     }
 
     public String join(String gameID, String playerColor) throws ResponseException {

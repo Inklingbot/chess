@@ -34,8 +34,7 @@ public class PreLoginUI {
             } catch (Throwable e) {
                 var msg = e.toString();
                 String[] msgs = msg.split(":");
-                System.out.print(msgs[1]);
-                System.out.print(msg + "\n");
+                System.out.print(msgs[1] + "\n");
             }
         }
 
@@ -71,10 +70,11 @@ public class PreLoginUI {
         RegisterResult result = facade.register(username, pass, email);
         //Store the username and authToken?
         PostLoginUI ui = new PostLoginUI(facade, result.authToken());
+        System.out.println("Successfully Registered!");
         ui.run();
         //call the appropriate class for this?
 
-        return "Successfully Registered";
+        return null;
     }
 
     public String login(String username, String pass) throws ResponseException {
