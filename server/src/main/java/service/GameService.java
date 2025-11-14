@@ -31,13 +31,13 @@ public class GameService {
             throw new BadRequestResponse("Error: bad request");
         }
 
-        if((!Objects.equals(request.playerColor(), "black") && !Objects.equals(request.playerColor(), "white"))) {
+        if((!Objects.equals(request.playerColor().toLowerCase(), "black") && !Objects.equals(request.playerColor().toLowerCase(), "white"))) {
             throw new BadRequestResponse("Error: already taken");
         }
 
         GameData data = gameDAO.getGame(request.gameID());
-        if ((Objects.equals(request.playerColor(), "black") && data.blackUsername() == null)
-                || (Objects.equals(request.playerColor(), "white") && data.whiteUsername() == null)) {
+        if ((Objects.equals(request.playerColor().toLowerCase(), "black") && data.blackUsername() == null)
+                || (Objects.equals(request.playerColor().toLowerCase(), "white") && data.whiteUsername() == null)) {
             AuthData authData = authDAO.getAuth(request.authToken());
             if (authData == null) {
                 throw new UnauthorizedResponse("error: unauthorized");
