@@ -19,7 +19,7 @@ public class DatabaseManager {
             """,
             """
             CREATE TABLE IF NOT EXISTS game (
-            gameID INT,
+            gameID INT NOT NULL AUTO_INCREMENT,
             whiteUsername VARCHAR(20),
             blackUsername VARCHAR(20),
             gameName VARCHAR(20),

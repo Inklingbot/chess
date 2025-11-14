@@ -2,7 +2,6 @@ package dataaccess;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import io.javalin.http.BadRequestResponse;
 import model.GameData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -42,18 +41,17 @@ public class SQLGameDAO implements GameDAO{
     }
 
     public void addGameToDB(Integer id, String gameName, String whiteUsername, String blackUsername, ChessGame game) throws DataAccessException {
-        String writingStatement = "INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, chessGame) VALUES (?, ?, ?, ?, ?);";
+        String writingStatement = "INSERT INTO game (whiteUsername, blackUsername, gameName, chessGame) VALUES (?, ?, ?, ?);";
         String gameJSON = gson.toJson(game);
-        String identification = String.valueOf(id);
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement(writingStatement)) {
-                preparedStatement.setString(1, identification);
-                preparedStatement.setString(2, whiteUsername);
-                preparedStatement.setString(3, blackUsername);
-                preparedStatement.setString(4, gameName);
-                preparedStatement.setString(5, gameJSON);
+                preparedStatement.setString(1, whiteUsername);
+                preparedStatement.setString(2, blackUsername);
+                preparedStatement.setString(3, gameName);
+                preparedStatement.setString(4, gameJSON);
 
                 preparedStatement.executeUpdate();
+                var rs = preparedStatement.getGeneratedKeys();
             }
         } catch (SQLException ex) {
             throw new ResponseException(String.format("Error: Unable to configure database: %s", ex.getNextException()));
@@ -135,19 +133,17 @@ public class SQLGameDAO implements GameDAO{
 
     public void insertColorName (String whitesUsername, String blacksUsername, int gameID, String data, String gameName)
             throws DataAccessException {
-                String writingStatement = """
-UPDATE game SET gameID = ?, whiteUsername = ?, blackUsername = ?,
-                gameName = ?, chessGame = ? WHERE gameID = ?;""";
+                String writingStatement = "UPDATE game SET whiteUsername = ?, blackUsername = ?, " +
+                        "gameName = ?, chessGame = ? WHERE gameID = ?;";
 
         String identify = String.valueOf(id);
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparingStatement = conn.prepareStatement(writingStatement)) {
-                preparingStatement.setString(1, identify);
-                preparingStatement.setString(2, whitesUsername);
-                preparingStatement.setString(3, blacksUsername);
-                preparingStatement.setString(4, gameName);
-                preparingStatement.setString(5, data);
-                preparingStatement.setInt(6, gameID);
+                preparingStatement.setString(1, whitesUsername);
+                preparingStatement.setString(2, blacksUsername);
+                preparingStatement.setString(3, gameName);
+                preparingStatement.setString(4, data);
+                preparingStatement.setInt(5, gameID);
 
                 preparingStatement.executeUpdate();
             }
