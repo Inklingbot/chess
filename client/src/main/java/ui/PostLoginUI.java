@@ -35,7 +35,9 @@ public class PostLoginUI {
             }
             try {
                 result = eval(line);
-                System.out.print(SET_TEXT_COLOR_BLUE + result);
+                if (result != null) {
+                    System.out.print(SET_TEXT_COLOR_BLUE + result);
+                }
                 if (leave) {
                     break;
                 }
@@ -91,7 +93,7 @@ public class PostLoginUI {
         return result.toString();
     }
 
-    public String join(String playerColor, String gameID) throws ResponseException {
+    public String join(String gameID, String playerColor) throws ResponseException {
         facade.join(playerColor, gameID, authToken);
 
         //display the board (starting state)
@@ -117,6 +119,7 @@ public class PostLoginUI {
 
     public String quit() {
         System.out.println("Thanks for playing!");
+        System.exit(0);
         return null;
         //somehow stop the program
     }

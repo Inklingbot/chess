@@ -82,11 +82,12 @@ public class PreLoginUI {
 
         PostLoginUI ui = new PostLoginUI(facade, result.authToken());
         ui.run();
-        return "Thank you.";
+        return SET_TEXT_COLOR_YELLOW + "Thank you.\n";
     }
 
     public String quit() {
-
+        System.out.println("Thanks for... wait you didn't even play? Do you not like my game bro?");
+        System.exit(0);
         //Should do this on its own when the loop ends
         return "quit";
     }

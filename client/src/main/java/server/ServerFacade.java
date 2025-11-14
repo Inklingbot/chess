@@ -69,7 +69,7 @@ public class ServerFacade {
         try{
             var path = "/game";
             ListGamesRequest request = new ListGamesRequest(authToken);
-            return this.makeRequest("GET", path, null, ListGamesResult.class, authToken);
+            return this.makeRequest("GET", path, request, ListGamesResult.class, authToken);
         }
         catch(ResponseException e) {
             throw new ResponseException(ResponseException.Code.ClientError, e.getMessage());
@@ -80,7 +80,7 @@ public class ServerFacade {
         try {
             var path = "/session";
             LogoutRequest request = new LogoutRequest(authToken);
-            this.makeRequest("DELETE", path, null, authToken);
+            this.makeRequest("DELETE", path, request, authToken);
         } catch (ResponseException e) {
             throw new ResponseException(ResponseException.Code.ClientError, e.getMessage());
         }
@@ -92,6 +92,9 @@ public class ServerFacade {
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
+            if (authToken != null) {
+                http.addRequestProperty("authorization", authToken);
+            }
 
             writeBody(request, http);
             http.connect();
