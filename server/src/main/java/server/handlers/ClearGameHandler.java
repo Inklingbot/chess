@@ -19,7 +19,7 @@ public class ClearGameHandler implements Handler {
         try {gameService.clearGame();
             ctx.status(200);}
         catch (DataAccessException exception) {
-            ctx.result(createJsonError(exception.getMessage()));
+            ctx.result(createJsonError("Error: This data doesn't exist!");
             ctx.status(500);
         }
 

@@ -30,17 +30,17 @@ public class CreateGameHandler implements Handler {
             ctx.status(200);
         }
         catch (BadRequestResponse b) {
-            String errorJson = createJsonError("Error: bad request");
+            String errorJson = createJsonError("Error: You missed a field somewhere, check your syntax!");
             ctx.result(errorJson);
             ctx.status(400);
         }
         catch(UnauthorizedResponse u) {
-            String errorJson = createJsonError("Error: unauthorized");
+            String errorJson = createJsonError("Error: You're unauthorized for this action!");
             ctx.result(errorJson);
             ctx.status(401);
         }
         catch(DataAccessException e) {
-            String errorJson = createJsonError("Error: Data not stored");
+            String errorJson = createJsonError("Error: This data doesn't exist!");
             ctx.result(errorJson);
             //If the data don't be accessin' set it to 500
             ctx.status(500);

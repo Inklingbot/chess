@@ -31,12 +31,13 @@ public class ListGamesHandler implements Handler {
             ctx.status(200);
         }
         catch (UnauthorizedResponse u) {
-            String errorJson = LogOutHandler.createJsonError(gson, "Error: unauthorized\n");
+            String errorJson = LogOutHandler.createJsonError(gson, "Error: You're unauthorized for this action!\n");
             ctx.result(errorJson);
             ctx.status(401);
         }
         catch(DataAccessException e) {
-            String errorJson = LogOutHandler.createJsonError(gson, "Error: Data not stored\n");
+            String errorJson = LogOutHandler.createJsonError(gson, "Error: THis data doesn't exist," +
+                    " or we couldn't access it!\n");
             ctx.result(errorJson);
             ctx.status(500);
         }

@@ -33,7 +33,8 @@ public class PostLoginUI {
                 System.out.print(SET_TEXT_COLOR_BLUE + result);
             } catch (Throwable e) {
                 var msg = e.toString();
-                System.out.print(msg);
+                String[] msgs = msg.split(":");
+                System.out.print(msgs[1]);
             }
         }
         System.out.println();

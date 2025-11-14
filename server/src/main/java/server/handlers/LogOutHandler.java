@@ -30,12 +30,13 @@ public class LogOutHandler implements Handler {
             ctx.status(200);
         }
         catch (UnauthorizedResponse u) {
-            String errorJson = createJsonError(gson, "Error: unauthorized");
+            String errorJson = createJsonError(gson, "Error: You're unauthorized for this action!\n");
             ctx.result(errorJson);
             ctx.status(401);
         }
         catch(DataAccessException e) {
-            String errorJson = createJsonError(gson, "Error: Data not stored");
+            String errorJson = createJsonError(gson, "Error: This data doesn't exist, " +
+                    "or we couldn't access it!\n");
             ctx.result(errorJson);
             ctx.status(500);
         }

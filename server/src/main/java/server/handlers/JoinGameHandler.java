@@ -30,36 +30,30 @@ public class JoinGameHandler implements Handler {
 
         }
         catch(DataAccessException d) {
-            String errorJson = createJsonError("Error: Data not stored");
+            String errorJson = createJsonError("Error: This data doesn't exist, or we couldn't access it!\n");
             ctx.result(errorJson);
             ctx.status(500);
 
         }
         catch(DuplicateNameException e) {
-            String errorJson = createJsonError("Error: already taken");
+            String errorJson = createJsonError("Error: Color already taken!\n");
             ctx.result(errorJson);
             ctx.status(403);
         }
         catch(BadRequestResponse b) {
-            String errorJson = createJsonError("Error: bad request");
+            String errorJson = createJsonError("Error: You missed a field somewhere, check your syntax!\n");
             ctx.result(errorJson);
             ctx.status(400);
         }
         catch(UnauthorizedResponse u) {
-            String errorJson = createJsonError("Error: unauthorized");
+            String errorJson = createJsonError("Error: You're unauthorized for this action!\n");
             ctx.result(errorJson);
             ctx.status(401);
         }
 
 
 
-        //Do the logic for JoinGame in the Service class
 
-        //if all goes well set Status to 200
-
-        //If they have no authToken for it then set status to 401
-
-        //WHAT IS 500
     }
     public String createJsonError(String error) {
         JsonObject jsonObject = new JsonObject();

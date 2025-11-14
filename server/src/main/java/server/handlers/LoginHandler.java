@@ -26,17 +26,17 @@ public class LoginHandler implements Handler {
             ctx.result(jsonString);
             ctx.status(200);
         } catch (DataAccessException e) {
-            String errorJson = createJsonError("Error: Data not stored");
+            String errorJson = createJsonError("Error: This data doesn't exist, or we couldn't access it!\n");
             ctx.result(errorJson);
             ctx.status(500);
         }
         catch (BadRequestResponse b) {
-            String errorJson = createJsonError("Error: bad request");
+            String errorJson = createJsonError("Error: You missed a field somewhere, check your syntax!\n");
             ctx.result(errorJson);
             ctx.status(400);
         }
         catch (UnauthorizedResponse u) {
-            String errorJson = createJsonError("Error: unauthorized");
+            String errorJson = createJsonError("Error: You're unauthorized for this action!\n");
             ctx.result(errorJson);
             ctx.status(401);
         }
