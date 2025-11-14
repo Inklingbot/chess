@@ -3,7 +3,6 @@ import model.CreateGameResult;
 import model.ListGamesResult;
 import server.ResponseException;
 import server.ServerFacade;
-import ui.EscapeSequences.*;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -98,10 +97,10 @@ public class PostLoginUI {
 
         //display the board (starting state)
         if (Objects.equals(playerColor, "white")) {
-            return boardInitial;
+            return BOARD_INITIAL;
         }
         else {
-            return boardInitial2;
+            return BOARD_INITIAL_2;
         }
 
     }
@@ -109,7 +108,7 @@ public class PostLoginUI {
     public String observe(String gameName) {
 
         //don't do anything??? Maybe find the game?
-        return boardInitial;
+        return BOARD_INITIAL;
     }
 
     public String logout() throws ResponseException {
@@ -125,10 +124,10 @@ public class PostLoginUI {
     }
 
     private void printPrompt() {
-        System.out.print(help);
+        System.out.print(HELP);
     }
 
-    public static final String help =
+    public static final String HELP =
          SET_TEXT_COLOR_MAGENTA + "create <NAME> " + SET_TEXT_COLOR_WHITE + "- create a game\n" +
                  SET_TEXT_COLOR_MAGENTA + "list " + SET_TEXT_COLOR_WHITE + "- list all games\n" +
                  SET_TEXT_COLOR_MAGENTA + "join <ID> {WHITE | BLACK} " + SET_TEXT_COLOR_WHITE
@@ -138,7 +137,7 @@ public class PostLoginUI {
                  SET_TEXT_COLOR_MAGENTA + "quit " + SET_TEXT_COLOR_WHITE + "- quit the program altogether\n" +
                  SET_TEXT_COLOR_MAGENTA + "help " + SET_TEXT_COLOR_WHITE + "- display this screen\n";
 
-    public static final String boardInitial = SET_BG_COLOR_DARK_GREY + "  a   b  c   d   e   f  g  h" + EMPTY +
+    public static final String BOARD_INITIAL = SET_BG_COLOR_DARK_GREY + "  a   b  c   d   e   f  g  h" + EMPTY +
             "\n" + "8" + SET_BG_COLOR_WHITE + SET_TEXT_COLOR_RED
             + BLACK_ROOK + SET_BG_COLOR_BLACK + BLACK_KNIGHT + SET_BG_COLOR_WHITE + BLACK_BISHOP + SET_BG_COLOR_BLACK
             + BLACK_QUEEN + SET_BG_COLOR_WHITE + BLACK_KING + SET_BG_COLOR_BLACK + BLACK_BISHOP + SET_BG_COLOR_WHITE
@@ -169,7 +168,7 @@ public class PostLoginUI {
             + WHITE_ROOK + SET_BG_COLOR_DARK_GREY + "1\n" + "  a   b  c   d   e  f   g  h" + EMPTY + "\n";
 
 
-    public static final String boardInitial2 = SET_BG_COLOR_DARK_GREY + "  a   b  c   d   e   f  g  h" + EMPTY +
+    public static final String BOARD_INITIAL_2 = SET_BG_COLOR_DARK_GREY + "  a   b  c   d   e   f  g  h" + EMPTY +
             "\n" + "8" + SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLUE
             + BLACK_ROOK + SET_BG_COLOR_BLACK + BLACK_KNIGHT + SET_BG_COLOR_WHITE + BLACK_BISHOP + SET_BG_COLOR_BLACK
             + BLACK_KING + SET_BG_COLOR_WHITE + BLACK_QUEEN + SET_BG_COLOR_BLACK + BLACK_BISHOP + SET_BG_COLOR_WHITE

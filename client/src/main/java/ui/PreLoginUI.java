@@ -92,7 +92,7 @@ public class PreLoginUI {
         return "quit";
     }
 
-    public static final String help =
+    public static final String HELP =
             SET_TEXT_COLOR_BLUE + "register <USERNAME> <PASSWORD> <EMAIL>"
             + SET_TEXT_COLOR_WHITE + " - to create an account \n"
             + SET_TEXT_COLOR_BLUE + "login <USERNAME> <PASSWORD> "
@@ -102,7 +102,7 @@ public class PreLoginUI {
             + SET_TEXT_COLOR_BLUE + "quit\n";
 
     private void printPrompt() {
-        System.out.print(help);
+        System.out.print(HELP);
     }
 
 }
