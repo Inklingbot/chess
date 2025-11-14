@@ -12,7 +12,7 @@ import java.net.http.*;
 
 public class ServerFacade {
 
-    //TODO: Create the board drawing
+
     private final String serverURL;
 
 
