@@ -94,6 +94,5 @@ public class SQLUserDAO implements UserDAO{
         }
     }
 
-    //might be an issue with duplicate db's
 
 }

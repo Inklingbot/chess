@@ -28,14 +28,25 @@ public class PostLoginUI {
 
         while (!result.equals("quit")) {
             printPrompt();
+            boolean leave = false;
             String line = scanner.nextLine();
+            if (Objects.equals(line, "logout")) {
+                leave = true;
+            }
             try {
                 result = eval(line);
                 System.out.print(SET_TEXT_COLOR_BLUE + result);
+                if (leave) {
+                    break;
+                }
+
             } catch (Throwable e) {
                 var msg = e.toString();
                 String[] msgs = msg.split(":");
-                System.out.print(msgs[1]);
+                for (int i = 1; i < msgs.length; i++)  {
+                    System.out.println(msgs[i]);
+                }
+
             }
         }
         System.out.println();
@@ -84,7 +95,13 @@ public class PostLoginUI {
         facade.join(playerColor, gameID, authToken);
 
         //display the board (starting state)
-        return boardInitial;
+        if (Objects.equals(playerColor, "white")) {
+            return boardInitial;
+        }
+        else {
+            return boardInitial2;
+        }
+
     }
 
     public String observe(String gameName) {
@@ -111,7 +128,8 @@ public class PostLoginUI {
     public static final String help =
          SET_TEXT_COLOR_MAGENTA + "create <NAME> " + SET_TEXT_COLOR_WHITE + "- create a game\n" +
                  SET_TEXT_COLOR_MAGENTA + "list " + SET_TEXT_COLOR_WHITE + "- list all games\n" +
-                 SET_TEXT_COLOR_MAGENTA + "join <ID> {WHITE | BLACK} " + SET_TEXT_COLOR_WHITE + "- join a game on a specified team\n" +
+                 SET_TEXT_COLOR_MAGENTA + "join <ID> {WHITE | BLACK} " + SET_TEXT_COLOR_WHITE
+                 + "- join a game on a specified team\n" +
                  SET_TEXT_COLOR_MAGENTA + "observe <ID> " + SET_TEXT_COLOR_WHITE + "- spectate a game\n" +
                  SET_TEXT_COLOR_MAGENTA + "logout " + SET_TEXT_COLOR_WHITE + "- return to logged out menu\n" +
                  SET_TEXT_COLOR_MAGENTA + "quit " + SET_TEXT_COLOR_WHITE + "- quit the program altogether\n" +
@@ -146,6 +164,40 @@ public class PostLoginUI {
             + WHITE_KNIGHT + SET_BG_COLOR_BLACK + WHITE_BISHOP + SET_BG_COLOR_WHITE + WHITE_QUEEN + SET_BG_COLOR_BLACK
             + WHITE_KING + SET_BG_COLOR_WHITE + WHITE_BISHOP + SET_BG_COLOR_BLACK + WHITE_KNIGHT + SET_BG_COLOR_WHITE
             + WHITE_ROOK + SET_BG_COLOR_DARK_GREY + "1\n" + "  a   b  c   d   e  f   g  h" + EMPTY + "\n";
+
+
+    public static final String boardInitial2 = SET_BG_COLOR_DARK_GREY + "  a   b  c   d   e   f  g  h" + EMPTY +
+            "\n" + "8" + SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLUE
+            + BLACK_ROOK + SET_BG_COLOR_BLACK + BLACK_KNIGHT + SET_BG_COLOR_WHITE + BLACK_BISHOP + SET_BG_COLOR_BLACK
+            + BLACK_KING + SET_BG_COLOR_WHITE + BLACK_QUEEN + SET_BG_COLOR_BLACK + BLACK_BISHOP + SET_BG_COLOR_WHITE
+            + BLACK_KNIGHT + SET_BG_COLOR_BLACK + BLACK_ROOK + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "8\n7"
+            + SET_TEXT_COLOR_BLUE + SET_BG_COLOR_BLACK
+            + BLACK_PAWN + SET_BG_COLOR_WHITE + BLACK_PAWN + SET_BG_COLOR_BLACK + BLACK_PAWN + SET_BG_COLOR_WHITE
+            + BLACK_PAWN + SET_BG_COLOR_BLACK + BLACK_PAWN + SET_BG_COLOR_WHITE + BLACK_PAWN + SET_BG_COLOR_BLACK
+            + BLACK_PAWN + SET_BG_COLOR_WHITE + BLACK_PAWN + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "7\n6"
+            + SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLUE
+            + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY
+            + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK
+            + EMPTY + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "6\n5" + SET_TEXT_COLOR_BLUE + SET_BG_COLOR_BLACK
+            + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY
+            + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE
+            + EMPTY + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "5\n4" + SET_TEXT_COLOR_BLUE + SET_BG_COLOR_WHITE
+            + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY
+            + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK
+            + EMPTY + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "4\n3" + SET_TEXT_COLOR_RED + SET_BG_COLOR_BLACK
+            + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY
+            + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE
+            + EMPTY + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "3\n2" + SET_BG_COLOR_WHITE + WHITE_PAWN
+            + SET_BG_COLOR_BLACK + SET_TEXT_COLOR_RED
+            + WHITE_PAWN + SET_BG_COLOR_WHITE + WHITE_PAWN + SET_BG_COLOR_BLACK + WHITE_PAWN +SET_BG_COLOR_WHITE
+            + WHITE_PAWN + SET_BG_COLOR_BLACK + WHITE_PAWN +SET_BG_COLOR_WHITE + WHITE_PAWN + SET_BG_COLOR_BLACK
+            + WHITE_PAWN + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "2\n1" + SET_TEXT_COLOR_RED
+            + SET_BG_COLOR_BLACK + WHITE_ROOK + SET_BG_COLOR_WHITE
+            + WHITE_KNIGHT + SET_BG_COLOR_BLACK + WHITE_BISHOP + SET_BG_COLOR_WHITE + WHITE_KING + SET_BG_COLOR_BLACK
+            + WHITE_QUEEN + SET_BG_COLOR_WHITE + WHITE_BISHOP + SET_BG_COLOR_BLACK + WHITE_KNIGHT + SET_BG_COLOR_WHITE
+            + WHITE_ROOK + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE
+            +  "1\n" + "  a   b  c   d   e  f   g  h" + EMPTY + "\n";
+
 
 
 }

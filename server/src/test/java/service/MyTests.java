@@ -20,13 +20,21 @@ public class MyTests {
 
     @BeforeAll
     public static void init() {
-        gameDAO = new MemoryGameDAO();
-        userDAO = new MemoryUserDAO();
-        authDAO = new MemoryAuthDAO();
+        gameDAO = new SQLGameDAO();
+        userDAO = new SQLUserDAO();
+        authDAO = new SQLAuthDAO();
         gameService = new GameService(authDAO, gameDAO, userDAO);
         userService = new UserService(authDAO, userDAO);
         existingUser = new UserData("ExistingUser", "existingUserPassword", "eu@mail.com");
         newUser = new RegisterRequest("NewUser", "newUserPassword", "nu@mail.com");
+
+        }
+
+        @BeforeEach
+        public void clear() throws DataAccessException {
+        gameDAO.clear();
+        userDAO.clear();
+        authDAO.clear();
 
         }
 
@@ -62,7 +70,7 @@ public class MyTests {
         //Creates a request
         RegisterRequest request = new RegisterRequest(null, "MyPasswordIs", "gmenden1@byu.edu");
         //Looks for the correct Error as it runs request
-        Assertions.assertThrows(BadRequestResponse.class, () -> userService.register(request), "Error: bad request");
+        Assertions.assertThrows(BadRequestResponse.class, () -> userService.register(request), "Error: bad request\n");
         gameService.clearGame();
     }
 
@@ -148,12 +156,14 @@ public class MyTests {
     @Test
     @DisplayName("Login Pos")
     public void loginPositive() throws DataAccessException {
-        RegisterResult registerResult = userService.register(new RegisterRequest("me", "myPassword", "me too"));
+
+        RegisterResult registerResult = userService.register(new RegisterRequest("me", "myPasswords", "me too"));
         Assertions.assertDoesNotThrow(() -> {
-            userService.login(new LoginRequest("me", "myPassword"));
+            userService.login(new LoginRequest("me", "myPasswords"));
         });
 
         gameService.clearGame();
+        userService.clear();
     }
 
     @Test
@@ -165,7 +175,7 @@ public class MyTests {
             userService.login(new LoginRequest("me", "Mehpassword"));
 
         });
-
+        userService.clear();
         gameService.clearGame();
     }
 
@@ -178,7 +188,7 @@ public class MyTests {
         Assertions.assertDoesNotThrow(() -> {
             userService.logout(new LogoutRequest(result.authToken()));
         });
-
+        userService.clear();
         gameService.clearGame();
 
     }
@@ -193,7 +203,7 @@ public class MyTests {
             userService.logout(new LogoutRequest("This isn't the right AuthToken!"));
 
         });
-
+        userService.clear();
         gameService.clearGame();
 
     }

@@ -11,7 +11,7 @@ import java.util.Objects;
 
 public class SQLGameDAO implements GameDAO{
     private final Gson gson = new Gson();
-    private int id = 0;
+
     @Override
     public void clear() throws DataAccessException {
         clearTable();
@@ -34,25 +34,33 @@ public class SQLGameDAO implements GameDAO{
     @Override
     public GameData createGame(String gameName) throws DataAccessException {
         ChessGame game = new ChessGame();
-        id++;
-        addGameToDB(id,  gameName, null, null, game);
+        int newID = addGameToDB(gameName, null, null, game);
 
-        return new GameData(id, null, null, gameName, game);
+        return new GameData(newID, null, null, gameName, game);
     }
 
-    public void addGameToDB(Integer id, String gameName, String whiteUsername, String blackUsername, ChessGame game) throws DataAccessException {
+    public int addGameToDB(String gameName, String whiteUsername, String blackUsername, ChessGame game) throws DataAccessException {
         String writingStatement = "INSERT INTO game (whiteUsername, blackUsername, gameName, chessGame) VALUES (?, ?, ?, ?);";
         String gameJSON = gson.toJson(game);
         try (var conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement(writingStatement)) {
+            try (var preparedStatement = conn.prepareStatement(writingStatement, java.sql.Statement.RETURN_GENERATED_KEYS)) {
                 preparedStatement.setString(1, whiteUsername);
                 preparedStatement.setString(2, blackUsername);
                 preparedStatement.setString(3, gameName);
                 preparedStatement.setString(4, gameJSON);
 
                 preparedStatement.executeUpdate();
-                var rs = preparedStatement.getGeneratedKeys();
+                try (var rs = preparedStatement.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        int generatedGameID = rs.getInt(1);
+                        return generatedGameID;
+                    }
+                    else {
+                        throw new DataAccessException("Uh oh");
+                    }
+                }
             }
+
         } catch (SQLException ex) {
             throw new ResponseException(String.format("Error: Unable to configure database: %s", ex.getNextException()));
         }
@@ -97,11 +105,11 @@ public class SQLGameDAO implements GameDAO{
 
     @Override
     public void updateGameUserJoin(String color, String username, int gameID, GameData data) throws DataAccessException {
-        String statement = "SELECT gameID, whiteUsername, blackUsername, gameName, chessGame FROM game WHERE gameID = " + gameID + ";";
+        String statement = "SELECT gameID, whiteUsername, blackUsername, gameName, chessGame FROM game WHERE gameID = " + "?;";
 
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement(statement)) {
-
+                preparedStatement.setInt(1, gameID);
                 ResultSet rs = preparedStatement.executeQuery();
                 if (rs.next()) {
                     String whitesUsername = rs.getString(2);
@@ -136,7 +144,7 @@ public class SQLGameDAO implements GameDAO{
                 String writingStatement = "UPDATE game SET whiteUsername = ?, blackUsername = ?, " +
                         "gameName = ?, chessGame = ? WHERE gameID = ?;";
 
-        String identify = String.valueOf(id);
+
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparingStatement = conn.prepareStatement(writingStatement)) {
                 preparingStatement.setString(1, whitesUsername);

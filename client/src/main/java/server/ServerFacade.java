@@ -24,7 +24,7 @@ public class ServerFacade {
         try {
             var path = "/user";
             RegisterRequest request = new RegisterRequest(username, pass, email);
-            return this.makeRequest("POST", path, request, RegisterResult.class);
+            return this.makeRequest("POST", path, request, RegisterResult.class, null);
         } catch (ResponseException e) {
             throw new ResponseException(ResponseException.Code.ClientError, e.getMessage());
         }
@@ -34,7 +34,7 @@ public class ServerFacade {
         try {
             var path = "/session";
             LoginRequest request = new LoginRequest(username, pass);
-            return this.makeRequest("POST", path, request, LoginResult.class);
+            return this.makeRequest("POST", path, request, LoginResult.class, null);
         }
         catch(ResponseException e) {
             throw new ResponseException(ResponseException.Code.ClientError, e.getMessage());
@@ -45,7 +45,7 @@ public class ServerFacade {
         try{
             var path = "/game";
             CreateGameRequest request = new CreateGameRequest(authToken, name);
-            return this.makeRequest("POST", path, request, CreateGameResult.class);
+            return this.makeRequest("POST", path, request, CreateGameResult.class, authToken);
         }
         catch(ResponseException e) {
             throw new ResponseException(ResponseException.Code.ClientError, e.getMessage());
@@ -57,7 +57,7 @@ public class ServerFacade {
         try{
             var path = "/game";
             JoinGameRequest request = new JoinGameRequest(authToken, playerColor, gameIDInt);
-            this.makeRequest("PUT", path, request);
+            this.makeRequest("PUT", path, request, authToken);
         }
         catch(ResponseException e) {
             throw new ResponseException(ResponseException.Code.ClientError, e.getMessage());
@@ -69,7 +69,7 @@ public class ServerFacade {
         try{
             var path = "/game";
             ListGamesRequest request = new ListGamesRequest(authToken);
-            return this.makeRequest("GET", path, request, ListGamesResult.class);
+            return this.makeRequest("GET", path, null, ListGamesResult.class, authToken);
         }
         catch(ResponseException e) {
             throw new ResponseException(ResponseException.Code.ClientError, e.getMessage());
@@ -80,13 +80,13 @@ public class ServerFacade {
         try {
             var path = "/session";
             LogoutRequest request = new LogoutRequest(authToken);
-            this.makeRequest("DELETE", path, request);
+            this.makeRequest("DELETE", path, null, authToken);
         } catch (ResponseException e) {
             throw new ResponseException(ResponseException.Code.ClientError, e.getMessage());
         }
     }
 
-    private void makeRequest(String method, String path, Object request) throws ResponseException {
+    private void makeRequest(String method, String path, Object request, String authToken) throws ResponseException {
         try {
             URL url = (new URI(serverURL + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
@@ -104,12 +104,15 @@ public class ServerFacade {
 
 
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws ResponseException {
         try {
             URL url = (new URI(serverURL + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
+            if (authToken != null) {
+                http.addRequestProperty("authorization", authToken);
+            }
 
             writeBody(request, http);
             http.connect();
