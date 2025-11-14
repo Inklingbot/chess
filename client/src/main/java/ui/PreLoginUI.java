@@ -74,7 +74,7 @@ public class PreLoginUI {
         ui.run();
         //call the appropriate class for this?
 
-        return null;
+        return "";
     }
 
     public String login(String username, String pass) throws ResponseException {

@@ -114,6 +114,7 @@ public class PostLoginUI {
 
     public String logout() throws ResponseException {
         facade.logout(authToken);
+        System.out.println("You're logged out!\n");
         return null;
     }
 
