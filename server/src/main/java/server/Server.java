@@ -37,6 +37,11 @@ public class Server {
         javalin.post("/game", context -> new CreateGameHandler(gameService).handle(context));
         //Join a Game
         javalin.put("/game", context -> new JoinGameHandler(gameService).handle(context));
+        javalin.ws("/ws", ws -> {
+            ws.onConnect(webSocketHandler);
+            ws.onMessage(webSocketHandler);
+            ws.onClose(webSocketHandler);
+        });
 
 
 

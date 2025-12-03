@@ -8,22 +8,15 @@ public abstract class PieceMoveCalculator {
 
 
     public static PieceMoveCalculator create (ChessPiece piece) {
-        switch(piece.getPieceType()) {
-            case ChessPiece.PieceType.KNIGHT:
-                return new KnightMoveCalculator();
-            case ChessPiece.PieceType.ROOK:
-                return new RookMoveCalculator();
-            case ChessPiece.PieceType.PAWN:
-                return new PawnMoveCalculator();
-            case ChessPiece.PieceType.KING:
-                return new KingMoveCalculator();
-            case ChessPiece.PieceType.BISHOP:
-                return new BishopMoveCalculator();
-            case ChessPiece.PieceType.QUEEN:
-                return new QueenMoveCalculator();
-            default:
-                throw new IllegalStateException("Unexpected value: " + piece);
-        }
+        return switch (piece.getPieceType()) {
+            case ChessPiece.PieceType.KNIGHT -> new KnightMoveCalculator();
+            case ChessPiece.PieceType.ROOK -> new RookMoveCalculator();
+            case ChessPiece.PieceType.PAWN -> new PawnMoveCalculator();
+            case ChessPiece.PieceType.KING -> new KingMoveCalculator();
+            case ChessPiece.PieceType.BISHOP -> new BishopMoveCalculator();
+            case ChessPiece.PieceType.QUEEN -> new QueenMoveCalculator();
+            default -> throw new IllegalStateException("Unexpected value: " + piece);
+        };
 
     }
     public Collection<ChessMove> pieceMovesCalc(ChessPiece piece, ChessBoard board, ChessPosition position) {

@@ -1,4 +1,7 @@
 package ui;
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessPosition;
 import model.CreateGameResult;
 import model.GameData;
 import model.ListGamesResult;
@@ -31,7 +34,9 @@ public class PostLoginUI {
 
         var result = "";
 
-        while (!result.equals("quit")) {
+        while (true) {
+            assert result != null;
+            if (result.equals("quit")) break;
             printPrompt();
             boolean leave = false;
             String line = scanner.nextLine();
@@ -39,7 +44,6 @@ public class PostLoginUI {
                 leave = true;
             }
             try {
-                var list = list();
                 result = eval(line);
                 if (result != null) {
                     System.out.print(SET_TEXT_COLOR_BLUE + result);
@@ -121,7 +125,7 @@ public class PostLoginUI {
     }
 
     public String join(String gameID, String playerColor) throws ResponseException {
-        Integer gameIDInt = Integer.valueOf(gameID);
+        int gameIDInt = Integer.parseInt(gameID);
 
         if (!(gameIDInt > ids.size())) {
             String gameIDDb = ids.get(gameIDInt).toString();
@@ -130,14 +134,15 @@ public class PostLoginUI {
         else {
             throw new ResponseException("This is not a valid gameID!");
         }
-
+        ChessBoard board = new ChessBoard();
+        board.resetBoard();
 
         //display the board (starting state)
         if (Objects.equals(playerColor, "white")) {
-            return BOARD_INITIAL;
+            return drawBoardWhite(board);
         }
         else {
-            return BOARD_INITIAL_2;
+            return drawBoardBlack(board);
         }
 
     }
@@ -207,38 +212,101 @@ public class PostLoginUI {
             + WHITE_ROOK + SET_BG_COLOR_DARK_GREY + "1\n" + "  a   b  c   d   e  f   g  h" + EMPTY + "\n";
 
 
-    public static final String BOARD_INITIAL_2 = SET_BG_COLOR_DARK_GREY + "  a   b  c   d   e   f  g  h" + EMPTY +
-            "\n" + "1" + SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLUE
-            + BLACK_ROOK + SET_BG_COLOR_BLACK + BLACK_KNIGHT + SET_BG_COLOR_WHITE + BLACK_BISHOP + SET_BG_COLOR_BLACK
-            + BLACK_KING + SET_BG_COLOR_WHITE + BLACK_QUEEN + SET_BG_COLOR_BLACK + BLACK_BISHOP + SET_BG_COLOR_WHITE
-            + BLACK_KNIGHT + SET_BG_COLOR_BLACK + BLACK_ROOK + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "1\n2"
-            + SET_TEXT_COLOR_BLUE + SET_BG_COLOR_BLACK
-            + BLACK_PAWN + SET_BG_COLOR_WHITE + BLACK_PAWN + SET_BG_COLOR_BLACK + BLACK_PAWN + SET_BG_COLOR_WHITE
-            + BLACK_PAWN + SET_BG_COLOR_BLACK + BLACK_PAWN + SET_BG_COLOR_WHITE + BLACK_PAWN + SET_BG_COLOR_BLACK
-            + BLACK_PAWN + SET_BG_COLOR_WHITE + BLACK_PAWN + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "2\n3"
-            + SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLUE
-            + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY
-            + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK
-            + EMPTY + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "3\n4" + SET_TEXT_COLOR_BLUE + SET_BG_COLOR_BLACK
-            + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY
-            + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE
-            + EMPTY + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "4\n5" + SET_TEXT_COLOR_BLUE + SET_BG_COLOR_WHITE
-            + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY
-            + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK
-            + EMPTY + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "5\n6" + SET_TEXT_COLOR_RED + SET_BG_COLOR_BLACK
-            + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY
-            + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE
-            + EMPTY + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "6\n7" + SET_BG_COLOR_WHITE + WHITE_PAWN
-            + SET_TEXT_COLOR_RED + SET_BG_COLOR_BLACK
-            + WHITE_PAWN + SET_BG_COLOR_WHITE + WHITE_PAWN + SET_BG_COLOR_BLACK + WHITE_PAWN +SET_BG_COLOR_WHITE
-            + WHITE_PAWN + SET_BG_COLOR_BLACK + WHITE_PAWN +SET_BG_COLOR_WHITE + WHITE_PAWN + SET_BG_COLOR_BLACK
-            + WHITE_PAWN + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "7\n8" + SET_TEXT_COLOR_RED
-            + SET_BG_COLOR_BLACK + WHITE_ROOK + SET_BG_COLOR_WHITE
-            + WHITE_KNIGHT + SET_BG_COLOR_BLACK + WHITE_BISHOP + SET_BG_COLOR_WHITE + WHITE_KING + SET_BG_COLOR_BLACK
-            + WHITE_QUEEN + SET_BG_COLOR_WHITE + WHITE_BISHOP + SET_BG_COLOR_BLACK + WHITE_KNIGHT + SET_BG_COLOR_WHITE
-            + WHITE_ROOK + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE
-            +  "8\n" + "  a   b  c   d   e  f   g  h" + EMPTY + "\n";
+
+    public String drawBoardWhite(ChessBoard board) {
+        StringBuilder s = new StringBuilder();
+        //Draws the Letters
+        s.append(SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + "  " +"a" + "  " + "b" + "  " + "c" + "  " + "d"
+                + "  " + "e" + "  " + "f" + "  " + "g" + "  " + "h"  + EMPTY +
+                "\n");
+        for (int j = 8; j > 0; j--) {
+            s.append(j);
+            for (int i = 1; i <=8; i++) {
+                    s.append(pieceCreator(board, i, j));
+            }
+            s.append(SET_BG_COLOR_DARK_GREY).append(SET_TEXT_COLOR_WHITE).append(j).append("\n");
+        }
+        s.append(SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + "  " +"a" + "  " + "b" + "  " + "c" + "  " + "d"
+                + "  " + "e" + "  " + "f" + "  " + "g" + "  " + "h"  + EMPTY +
+                "\n");
+        return s.toString();
+    }
+
+    public String drawBoardBlack(ChessBoard board) {
+        StringBuilder s = new StringBuilder();
+        //Draws the
+        //"  a   b  c   d   e   f  g  h"
+        s.append(SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + "  " +"a" + "  " + "b" + "  " + "c" + "  " + "d"
+                + "  " + "e" + "  " + "f" + "  " + "g" + "  " + "h"  + EMPTY +
+                "\n");
+        for (int j = 1; j<= 8; j++) {
+            s.append(j);
+            for (int i = 1; i <=8; i++) {
+                s.append(pieceCreator(board, i, j));
+            }
+            s.append(SET_BG_COLOR_DARK_GREY).append(SET_TEXT_COLOR_WHITE).append(j).append("\n");
+        }
+        s.append(SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + "  " +"a" + "  " + "b" + "  " + "c" + "  " + "d"
+                + "  " + "e" + "  " + "f" + "  " + "g" + "  " + "h"  + EMPTY +
+                "\n");
+        return s.toString();
+    }
+
+    public String pieceCreator(ChessBoard board, int i, int j) {
+        String s = "";
 
 
+        //What space is it
+        if (j % 2 == 0) {
+            if (i % 2 == 0) {
+                s+= SET_BG_COLOR_BLACK;
+            }
+            else {
+                s+= SET_BG_COLOR_WHITE;
+            }
+        }
+        else {
+            if (i % 2 == 0) {
+                s+=SET_BG_COLOR_WHITE;
+            }
+            else {
+                s+=SET_BG_COLOR_BLACK;
+            }
+        }
+        if (board.getPiece(new ChessPosition(j, i)) != null) {
+            //If the piece is white or black
+            if (board.getPiece(new ChessPosition(j, i)).getTeamColor() == ChessGame.TeamColor.WHITE) {
+                s+=SET_TEXT_COLOR_RED;
+            }
+            else {
+                s+=SET_TEXT_COLOR_BLUE;
+            }
+            switch(board.getPiece(new ChessPosition(j, i)).getPieceType()) {
+                case KNIGHT:
+                    s+=BLACK_KNIGHT;
+                    break;
+                case BISHOP:
+                    s+=BLACK_BISHOP;
+                    break;
+                case KING:
+                    s+=BLACK_KING;
+                    break;
+                case QUEEN:
+                    s+=BLACK_QUEEN;
+                    break;
+                case PAWN:
+                    s+=BLACK_PAWN;
+                    break;
+                case ROOK:
+                    s+=BLACK_ROOK;
+                    break;
+            }
+        }
+        else {
+            s+=EMPTY;
+        }
 
+
+        return s;
+    }
 }
