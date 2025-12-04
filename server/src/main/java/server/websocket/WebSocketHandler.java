@@ -1,6 +1,5 @@
 package server.websocket;
 
-import chess.ChessGame;
 import chess.ChessMove;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
@@ -11,10 +10,12 @@ import io.javalin.websocket.WsConnectContext;
 import io.javalin.websocket.WsConnectHandler;
 import io.javalin.websocket.WsMessageContext;
 import io.javalin.websocket.WsMessageHandler;
+import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
-import server.Server;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGame;
 import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
 
@@ -23,6 +24,7 @@ import java.io.IOException;
 import static websocket.messages.ServerMessage.ServerMessageType.*;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
+    private final Gson gson = new Gson();
 
     private final ConnectionManager connections = new ConnectionManager();
     GameDAO gameDAO;
@@ -45,8 +47,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         try {
             UserGameCommand message = new Gson().fromJson(ctx.message(), UserGameCommand.class);
             switch (message.getCommandType()) {
-                case CONNECT -> enter(message.getAuthToken(), message.getGameID(), ctx.session);
-                case MAKE_MOVE -> makeMove(null, message.getAuthToken(), message.getGameID(), ctx.session);
+                case CONNECT -> connect(message.getAuthToken(), message.getGameID(), ctx.session);
+                case MAKE_MOVE -> makeMove(message.getMove(), message.getAuthToken(), message.getGameID(), ctx.session);
                 case LEAVE -> exit(message.getAuthToken(), message.getGameID(), ctx.session);
                 case RESIGN -> resign(message.getAuthToken(), message.getGameID(), ctx.session);
             }
@@ -63,16 +65,23 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private void makeMove(ChessMove move, String authToken, Integer gameID, Session session) throws IOException {
         try {
             if (authDAO.getAuth(authToken) != null) {
-                GameData game = gameDAO.getGame(gameID);
+                GameData gameData = gameDAO.getGame(gameID);
                 //Create a variable that will load the game
-                game.chessGame().makeMove(move);
+                gameData.chessGame().makeMove(move);
 
-                var notification = new ServerMessage(LOAD_GAME, game);
-                connections.show(session, notification);
+
+                String game = gson.toJson(gameData);
+                var notification = new LoadGame(game);
+                connections.broadcast(null, notification);
+
             }
-            var notification = new ServerMessage(ERROR, null);
+            else {
+                ServerMessage notification = new ErrorMessage("This didn't work");
+                connections.broadcast(null, notification);
+            }
+
             //Send the Message to the Client
-            connections.show(session, notification);
+
         }
         catch (InvalidMoveException i) {
 
@@ -82,25 +91,36 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     }
 
-    private void enter(String authToken, Integer gameID, Session session) throws IOException {
+    private void connect(String authToken, Integer gameID, Session session) throws IOException {
         //Add the session to the list
         connections.add(session);
 
         //Somehow obtain the game to display to the client
         try {
             if (authDAO.getAuth(authToken) != null) {
-                GameData game = gameDAO.getGame(gameID);
-                //Create a variable that will load the game
+                GameData gameData = gameDAO.getGame(gameID);
+                    AuthData auth = authDAO.getAuth(authToken);
+                    String user = auth.username();
+                    //Create a variable that will load the game
+                    String game = gson.toJson(gameData);
+                    var notification = new LoadGame(game);
+                    connections.show(session, notification);
+                    ServerMessage notify = new Notification(user + " has Joined.");
+                    connections.broadcast(session, notify);
 
-                var notification = new ServerMessage(LOAD_GAME, game);
+
+            }
+            else {
+                var notification = new ErrorMessage("You're unauthorized! Please try again.");
+                //Send the Message to the Client
                 connections.show(session, notification);
             }
         } catch (DataAccessException e) {
-            throw new RuntimeException(e);
+            var notification = new ErrorMessage("This gameID is invalid! Please choose another.");
+            //Send the Message to the Client
+            connections.show(session, notification);
         }
-        var notification = new ServerMessage(ERROR, null);
-        //Send the Message to the Client
-        connections.show(session, notification);
+
     }
 
     private void exit(String authToken, Integer gameID, Session session) throws IOException {
@@ -114,14 +134,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         try {
             if (authDAO.getAuth(authToken) != null) {
                 GameData game = gameDAO.getGame(gameID);
-                connections.broadcast(null, new ServerMessage(NOTIFICATION, null));
+                connections.broadcast(null, new Notification("Player resigned"));
                 connections.remove(session);
                 //Somehow remove the player
             }
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
-        var notification = new ServerMessage(ERROR, null);
+        var notification = new ErrorMessage("This isn't working");
         //Send the Message to the Client
         connections.show(session, notification);
     }
