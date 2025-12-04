@@ -3,6 +3,7 @@ package server;
 import dataaccess.*;
 import io.javalin.*;
 import server.handlers.*;
+import server.websocket.WebSocketHandler;
 import service.GameService;
 import service.UserService;
 
@@ -17,6 +18,7 @@ public class Server {
     private UserDAO userDAO = new SQLUserDAO();
     private GameService gameService = new GameService(authDAO, gameDAO, userDAO);
     private UserService userService = new UserService(authDAO, userDAO);
+    public WebSocketHandler webSocketHandler = new WebSocketHandler(gameDAO, userDAO, authDAO);
 
 
     public Server() {
