@@ -1,6 +1,7 @@
 package ui;
 import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPosition;
 import model.CreateGameResult;
 import model.GameData;
@@ -8,10 +9,7 @@ import model.ListGamesResult;
 import server.ResponseException;
 import server.ServerFacade;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 import static ui.EscapeSequences.*;
 
@@ -130,7 +128,7 @@ public class PostLoginUI {
         if (!(gameIDInt > ids.size())) {
             String gameIDDb = ids.get(gameIDInt).toString();
             facade.join(playerColor, gameIDDb, authToken);
-            GameplayUI ui =  new GameplayUI(authToken, gameIDInt, playerColor);
+            GameplayUI ui =  new GameplayUI(authToken, gameIDInt, playerColor, facade);
             ui.run();
         }
         else {
@@ -144,7 +142,7 @@ public class PostLoginUI {
         int gameIDInt = Integer.parseInt(gameID);
         if (!(gameIDInt > ids.size())) {
             String gameIDDb = ids.get(gameIDInt).toString();
-            GameplayUI ui = new GameplayUI(authToken, gameIDInt, null);
+            GameplayUI ui = new GameplayUI(authToken, gameIDInt, null, facade);
             ui.run();
         }
         else {
@@ -214,7 +212,7 @@ public class PostLoginUI {
 
 
 
-    public static String drawBoardWhite(ChessBoard board) {
+    public static String drawBoardWhite(ChessBoard board, Collection<ChessMove> moves) {
         StringBuilder s = new StringBuilder();
         //Draws the Letters
         s.append(SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + "  " +"a" + "  " + "b" + "  " + "c" + "  " + "d"
@@ -233,7 +231,7 @@ public class PostLoginUI {
         return s.toString();
     }
 
-    public static String drawBoardBlack(ChessBoard board) {
+    public static String drawBoardBlack(ChessBoard board, Collection<ChessMove> moves) {
         StringBuilder s = new StringBuilder();
         //Draws the
         //"  a   b  c   d   e   f  g  h"

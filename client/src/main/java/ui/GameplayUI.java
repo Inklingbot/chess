@@ -1,19 +1,25 @@
 package ui;
 
-import chess.ChessGame;
+
 import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
+import model.GameData;
+import model.ListGamesResult;
 import server.ResponseException;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
-import static ui.EscapeSequences.SET_TEXT_COLOR_MAGENTA;
 import static ui.EscapeSequences.SET_TEXT_COLOR_WHITE;
+
+import server.ServerFacade;
 import server.WSEchoClient;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 
 public class GameplayUI {
@@ -21,26 +27,34 @@ public class GameplayUI {
     WSEchoClient client = new WSEchoClient();
     Integer gameID;
     String playerColor;
-    ChessGame game;
-    public GameplayUI(String authToken, Integer gameID, String playerColor) {
+    private final ServerFacade facade;
+    GameData game;
+    public GameplayUI(String authToken, Integer gameID, String playerColor, ServerFacade facade) {
         this.authToken = authToken;
         this.gameID = gameID;
         this.playerColor = playerColor;
-
+        this.facade = facade;
     }
 
     public void run() {
-        client.WsEchoClient();
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Welcome to the game!");
-        System.out.println(redraw());
+        Scanner scanner;
+        try {
+            client.WsEchoClient();
+            client.send(new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID));
+            scanner = new Scanner(System.in);
+            System.out.print("Welcome to the game!");
+            System.out.println(redraw());
+
+            updateGameInUI();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         var result = "";
-
         while (true) {
             assert result != null;
             if (result.equals("quit")) break;
-            printPrompt();
+            System.out.println(printPrompt());
             boolean leave = false;
             String line = scanner.nextLine();
             if (Objects.equals(line, "logout")) {
@@ -54,7 +68,6 @@ public class GameplayUI {
                 if (leave) {
                     break;
                 }
-
             }
             catch(NumberFormatException n) {
                 System.out.println("Please use the format \" 1 \" for the game number.");
@@ -66,13 +79,21 @@ public class GameplayUI {
                     System.out.println(msgs[i]);
 //                    System.out.println(msg);
                 }
-
             }
         }
         System.out.println();
     }
 
-    public String eval(String input) throws ResponseException {
+    private void updateGameInUI() throws ResponseException {
+        ListGamesResult listResult = facade.list(authToken);
+        for (GameData game : listResult.games()) {
+            if (gameID == game.gameID()) {
+                this.game = game;
+            }
+        }
+    }
+
+    public String eval(String input) throws ResponseException, IOException {
         String[] tokens = input.toLowerCase().split(" ");
         String cmd = (tokens.length > 0) ? tokens[0] : "help";
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
@@ -109,8 +130,8 @@ public class GameplayUI {
         };
     }
 
-        private void printPrompt() {
-            System.out.print(HELP);
+        private String printPrompt() {
+            return HELP;
         }
 
         public static final String HELP =
@@ -119,7 +140,7 @@ public class GameplayUI {
                         "- display board again\n" +
                         SET_TEXT_COLOR_GREEN + "Leave " + SET_TEXT_COLOR_WHITE
                         + "- Leave the game, go back to previous menu.\n" +
-                        SET_TEXT_COLOR_GREEN + "Make Move <startPos.> <endPos.>" + SET_TEXT_COLOR_WHITE +
+                        SET_TEXT_COLOR_GREEN + "Make Move a-h1-8 a-h1-8" + SET_TEXT_COLOR_WHITE +
                         "- Make a valid move on your turn\n" +
                         SET_TEXT_COLOR_GREEN + "Resign " + SET_TEXT_COLOR_WHITE +
                         "- give up and forfeit the game.\n" +
@@ -129,13 +150,13 @@ public class GameplayUI {
 
     public String redraw() {
         if (Objects.equals(playerColor, "white")) {
-            return PostLoginUI.drawBoardWhite(board);
+            return PostLoginUI.drawBoardWhite(game.chessGame().getBoard(), null);
         }
         else if (Objects.equals(playerColor, "black")){
-            return PostLoginUI.drawBoardBlack(board);
+            return PostLoginUI.drawBoardBlack(game.chessGame().getBoard(), null);
         }
         else {
-            return PostLoginUI.drawBoardWhite(board);
+            return PostLoginUI.drawBoardWhite(game.chessGame().getBoard(), null);
         }
     }
 
@@ -145,12 +166,42 @@ public class GameplayUI {
         return ("You have left the game.");
     }
 
-    public String move(String startPos, String endPos) {
-        ChessPosition position1 =  new ChessPosition();
-        ChessPosition position2 = new ChessPosition();
-        //TODO: Find some way to prompt the user for promotion IF it's in promotion territory
-        ChessMove move = new ChessMove(position1, position2, null);
-
+    public String move(String startPos, String endPos) throws IOException {
+        ChessPosition position1 =  parseMove(startPos);
+        ChessPosition position2 = parseMove(endPos);
+        ChessPiece.PieceType promotionPiece = null;
+        if (game.chessGame().getBoard().getPiece(position1).getPieceType() == ChessPiece.PieceType.PAWN
+                && position2.getRow() == 8) {
+            boolean inputPiece = false;
+            Scanner scanner2 = new Scanner(System.in);
+            while (!inputPiece) {
+                System.out.println("Please select what piece you'd like to promote this pawn to.");
+                String promote = scanner2.nextLine();
+                if (promote.equalsIgnoreCase("Knight")) {
+                    promotionPiece = ChessPiece.PieceType.KNIGHT;
+                    inputPiece = true;
+                }
+                else if (promote.equalsIgnoreCase("Queen")) {
+                    promotionPiece = ChessPiece.PieceType.QUEEN;
+                    inputPiece = true;
+                }
+                else if (promote.equalsIgnoreCase("Rook")) {
+                    promotionPiece = ChessPiece.PieceType.ROOK;
+                    inputPiece = true;
+                }
+                else if (promote.equalsIgnoreCase("Bishop")) {
+                    promotionPiece = ChessPiece.PieceType.BISHOP;
+                    inputPiece = true;
+                }
+                else {
+                    System.out.println("This is not a valid piece you can promote the pawn to! Try again!");
+                }
+            }
+            scanner2.close();
+        }
+        ChessMove move = new ChessMove(position1, position2, promotionPiece);
+        MakeMoveCommand moving = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, move);
+        client.send(moving);
         return("Move made.");
     }
 
@@ -160,8 +211,47 @@ public class GameplayUI {
         return ("You have resigned.");
     }
 
-    public void legals(String pos) {
+    public String legals(String pos) {
+        ChessPosition position = parseMove(pos);
+        Collection<ChessMove> moves = game.chessGame().validMoves(position);
+        if (Objects.equals(playerColor, "white")) {
+            return PostLoginUI.drawBoardWhite(game.chessGame().getBoard(), moves);
+        }
+        else if (Objects.equals(playerColor, "black")){
+            return PostLoginUI.drawBoardBlack(game.chessGame().getBoard(), moves);
+        }
+        return "Error?";
+    }
 
+    public ChessPosition parseMove (String pos) {
+        String row = pos.substring(0, 1);
+        String col = pos.substring(1, 2);
+        if (row.equalsIgnoreCase("a")) {
+            row = "1";
+        }
+        else if (row.equalsIgnoreCase("b")) {
+            row = "2";
+        }
+        else if (row.equalsIgnoreCase("c")) {
+            row = "3";
+        }
+        else if (row.equalsIgnoreCase("d")) {
+            row = "4";
+        }
+        else if (row.equalsIgnoreCase("e")) {
+            row = "5";
+        }
+        else if (row.equalsIgnoreCase("f")) {
+            row = "6";
+        }
+        else if (row.equalsIgnoreCase("g")) {
+            row = "7";
+        }
+        else if (row.equalsIgnoreCase("h")) {
+            row = "8";
+        }
+
+        return new ChessPosition(Integer.parseInt(row), Integer.parseInt(col));
     }
 
 
