@@ -14,6 +14,7 @@ import static ui.EscapeSequences.*;
 import static ui.EscapeSequences.SET_TEXT_COLOR_MAGENTA;
 import static ui.EscapeSequences.SET_TEXT_COLOR_WHITE;
 import server.WSEchoClient;
+import websocket.commands.UserGameCommand;
 
 public class GameplayUI {
     String authToken;
@@ -139,7 +140,8 @@ public class GameplayUI {
     }
 
     public String leave() throws IOException {
-        client.send("LEAVE");
+        UserGameCommand leave = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
+        client.send(leave);
         return ("You have left the game.");
     }
 
@@ -149,7 +151,17 @@ public class GameplayUI {
         //TODO: Find some way to prompt the user for promotion IF it's in promotion territory
         ChessMove move = new ChessMove(position1, position2, null);
 
-                return("Move made.");
+        return("Move made.");
+    }
+
+    public String resign() throws IOException {
+        UserGameCommand resign = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
+        client.send(resign);
+        return ("You have resigned.");
+    }
+
+    public void legals(String pos) {
+
     }
 
 
