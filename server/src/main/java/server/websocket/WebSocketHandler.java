@@ -70,12 +70,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             //first check if they previously checkmated
             if (mateReached) {
                 var errorCheckmate = new ErrorMessage("You cannot move anymore, a player has won the game!");
-                connections.show(session, errorCheckmate);
+                connections.show(session, errorCheckmate, gameID);
             }
             //then check if a player has currently resigned
             else if (playerResigned) {
                 var resignedMessage = new ErrorMessage("A player has resigned, you cannot move right now.");
-                connections.show(session, resignedMessage);
+                connections.show(session, resignedMessage, gameID);
 
             }
             //to actually make a move, first check that they are a real user
@@ -92,7 +92,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                         currGame.isInStalemate(ChessGame.TeamColor.BLACK)) {
                     mateReached = true;
                     var errorCheckmate = new ErrorMessage("You cannot move anymore, a player has won the game!");
-                    connections.show(session, errorCheckmate);
+                    connections.show(session, errorCheckmate, gameID);
                     return;
                 }
                 //make the move
@@ -100,29 +100,29 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 gameDAO.updateGame(gameData.chessGame(), gameID);
                 String game = gson.toJson(gameData);
                 var notification = new LoadGame(game);
-                connections.broadcast(null, notification);
+                connections.broadcast(null, notification, gameID);
                 var moveNotify = new Notification(user + " made move " + move.toString());
-                connections.broadcast(session, moveNotify);
+                connections.broadcast(session, moveNotify, gameID);
             }
 
             else {
                 ServerMessage notification = new ErrorMessage("This didn't work, but ngl I don't know why bro");
-                connections.broadcast(null, notification);
+                connections.broadcast(null, notification, gameID);
             }
         }
         catch (DataAccessException e) {
             var dataNotStored = new ErrorMessage("You might not believe me," +
                     " but the data here is corrupted or not stored?");
-            connections.show(session, dataNotStored);
+            connections.show(session, dataNotStored, gameID);
         } catch (InvalidMoveException e) {
             var wrongMove = new ErrorMessage("This is not a valid move, Genevieve.");
-            connections.show(session, wrongMove);
+            connections.show(session, wrongMove, gameID);
         }
     }
 
     private void connect(String authToken, Integer gameID, Session session) throws IOException {
         //Add the session to the list
-        connections.add(session);
+        connections.add(session, gameID);
 
         //Somehow obtain the game to display to the client
         try {
@@ -133,29 +133,29 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     //Create a variable that will load the game
                     String game = gson.toJson(gameData);
                     var notification = new LoadGame(game);
-                    connections.show(session, notification);
+                    connections.show(session, notification, gameID);
                     ServerMessage notify = new Notification(user + " has Joined.");
-                    connections.broadcast(session, notify);
+                    connections.broadcast(session, notify, gameID);
 
 
             }
             else {
                 var notification = new ErrorMessage("You're unauthorized! Please try again.");
                 //Send the Message to the Client
-                connections.show(session, notification);
+                connections.show(session, notification, gameID);
             }
         } catch (DataAccessException e) {
             var notification = new ErrorMessage("This gameID is invalid! Please choose another.");
             //Send the Message to the Client
-            connections.show(session, notification);
+            connections.show(session, notification, gameID);
         }
 
     }
 
     private void exit(String authToken, Integer gameID, Session session) throws IOException {
-        connections.remove(session);
+        connections.remove(session, gameID);
         //How do I send a specific message, like the "Player left the game?"
-        connections.broadcast(session, new Notification("Player left the game."));
+        connections.broadcast(session, new Notification("Player left the game."), gameID);
     }
 
     private void resign(String authToken, Integer gameID, Session session) throws IOException {
@@ -163,16 +163,16 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             if (authDAO.getAuth(authToken) != null && !playerResigned) {
                 GameData game = gameDAO.getGame(gameID);
                 String username = authDAO.getAuth(authToken).username();
-                connections.broadcast(null, new Notification(username + " resigned"));
-                connections.remove(session);
+                connections.broadcast(null, new Notification(username + " resigned"), gameID);
+                connections.remove(session, gameID);
                 playerResigned = true;
                 //Somehow remove the player
             }
             else if (playerResigned) {
-                connections.show(session, new ErrorMessage("You cannot resign!"));
+                connections.show(session, new ErrorMessage("You cannot resign!"), gameID);
             }
             else {
-                connections.show(session, new ErrorMessage("You cannot resign!"));
+                connections.show(session, new ErrorMessage("You cannot resign!"), gameID);
             }
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
