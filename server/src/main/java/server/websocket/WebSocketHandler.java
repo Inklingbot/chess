@@ -14,6 +14,7 @@ import io.javalin.websocket.WsMessageHandler;
 import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
+import org.jetbrains.annotations.NotNull;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGame;
@@ -21,13 +22,16 @@ import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Objects;
 
-import static websocket.messages.ServerMessage.ServerMessageType.*;
+import static chess.ChessGame.TeamColor.BLACK;
+import static chess.ChessGame.TeamColor.WHITE;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     private final Gson gson = new Gson();
-    boolean playerResigned = false;
-    boolean mateReached = false;
+
+    HashMap<Integer, Boolean> resignChecker = new HashMap<>();
 
     private final ConnectionManager connections = new ConnectionManager();
     GameDAO gameDAO;
@@ -61,36 +65,49 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     @Override
-    public void handleClose(WsCloseContext ctx) {
+    public void handleClose(@NotNull WsCloseContext ctx) {
         System.out.println("Websocket closed");
     }
 
     private void makeMove(ChessMove move, String authToken, Integer gameID, Session session) throws IOException {
         try {
+            GameData gameData = gameDAO.getGame(gameID);
+            ChessGame currGame = gameData.chessGame();
             //first check if they previously checkmated
-            if (mateReached) {
-                var errorCheckmate = new ErrorMessage("You cannot move anymore, a player has won the game!");
+            if (currGame.getGameOver() == true) {
+                var errorCheckmate = new ErrorMessage("You cannot make this move, the game is over!");
                 connections.show(session, errorCheckmate, gameID);
-            }
-            //then check if a player has currently resigned
-            else if (playerResigned) {
-                var resignedMessage = new ErrorMessage("A player has resigned, you cannot move right now.");
-                connections.show(session, resignedMessage, gameID);
-
             }
             //to actually make a move, first check that they are a real user
             else if (authDAO.getAuth(authToken) != null) {
                 //grab the user and the game
+                boolean correctUser = false;
                 AuthData auth = authDAO.getAuth(authToken);
                 String user = auth.username();
-                GameData gameData = gameDAO.getGame(gameID);
-                ChessGame currGame = gameData.chessGame();
-                //if they're check/stalemated
-                if (currGame.isInCheckmate(ChessGame.TeamColor.WHITE) ||
-                        currGame.isInCheckmate(ChessGame.TeamColor.BLACK) ||
-                        currGame.isInStalemate(ChessGame.TeamColor.WHITE) ||
-                        currGame.isInStalemate(ChessGame.TeamColor.BLACK)) {
-                    mateReached = true;
+                if (currGame.getTeamTurn() == WHITE) {
+                    if (Objects.equals(user, gameData.whiteUsername())) {
+                        correctUser = true;
+                    }
+                }
+                else if (currGame.getTeamTurn() == BLACK) {
+                    if (Objects.equals(user, gameData.blackUsername())) {
+                        correctUser = true;
+                    }
+                }
+
+                if (!correctUser) {
+                    var ErrorNotAllowed = new ErrorMessage("You're not allowed to move!");
+                    connections.show(session, ErrorNotAllowed, gameID);
+                    return;
+                }
+
+                //if they're checkmated or stalemated
+                if (currGame.isInCheckmate(WHITE) ||
+                        currGame.isInCheckmate(BLACK) ||
+                        currGame.isInStalemate(WHITE) ||
+                        currGame.isInStalemate(BLACK)) {
+                    currGame.setGameOver(true);
+                    gameDAO.updateGame(currGame, gameID);
                     var errorCheckmate = new ErrorMessage("You cannot move anymore, a player has won the game!");
                     connections.show(session, errorCheckmate, gameID);
                     return;
@@ -101,13 +118,13 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 String game = gson.toJson(gameData);
                 var notification = new LoadGame(game);
                 connections.broadcast(null, notification, gameID);
-                var moveNotify = new Notification(user + " made move " + move.toString());
+                var moveNotify = new Notification(user + " made move " + move);
                 connections.broadcast(session, moveNotify, gameID);
             }
 
             else {
                 ServerMessage notification = new ErrorMessage("This didn't work, but ngl I don't know why bro");
-                connections.broadcast(null, notification, gameID);
+                connections.show(session, notification, gameID);
             }
         }
         catch (DataAccessException e) {
@@ -123,6 +140,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private void connect(String authToken, Integer gameID, Session session) throws IOException {
         //Add the session to the list
         connections.add(session, gameID);
+        resignChecker.put(gameID, false);
 
         //Somehow obtain the game to display to the client
         try {
@@ -156,19 +174,44 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         connections.remove(session, gameID);
         //How do I send a specific message, like the "Player left the game?"
         connections.broadcast(session, new Notification("Player left the game."), gameID);
+
+        try {
+            String username = authDAO.getAuth(authToken).username();
+            GameData game = gameDAO.getGame(gameID);
+            if (Objects.equals(game.whiteUsername(), username)) {
+                gameDAO.updateGameUserJoin("WHITE", null, gameID, game);
+            }
+            else if (Objects.equals(game.blackUsername(), username)) {
+                gameDAO.updateGameUserJoin("BLACK", null, gameID, game);
+            }
+
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     private void resign(String authToken, Integer gameID, Session session) throws IOException {
         try {
-            if (authDAO.getAuth(authToken) != null && !playerResigned) {
+            boolean resignation = resignChecker.get(gameID);
+            if (authDAO.getAuth(authToken) != null && !resignation) {
                 GameData game = gameDAO.getGame(gameID);
                 String username = authDAO.getAuth(authToken).username();
+                if (!Objects.equals(game.whiteUsername(), username) &&
+                        !Objects.equals(game.blackUsername(), username)) {
+                    var observerIsDumb = new ErrorMessage("You're an Observer, you cannot resign!");
+                    connections.show(session, observerIsDumb, gameID);
+                    return;
+                }
                 connections.broadcast(null, new Notification(username + " resigned"), gameID);
                 connections.remove(session, gameID);
-                playerResigned = true;
+                resignChecker.put(gameID, true);
+                ChessGame chessGame = game.chessGame();
+                chessGame.setGameOver(true);
+                gameDAO.updateGame(chessGame, gameID);
                 //Somehow remove the player
             }
-            else if (playerResigned) {
+            else if (resignation) {
                 connections.show(session, new ErrorMessage("You cannot resign!"), gameID);
             }
             else {

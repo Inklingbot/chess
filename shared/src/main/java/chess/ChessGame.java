@@ -17,6 +17,15 @@ import static chess.ChessGame.TeamColor.BLACK;
 public class ChessGame {
     private ChessBoard board = new ChessBoard();
 
+    public Boolean getGameOver() {
+        return gameOver;
+    }
+
+    public void setGameOver(Boolean gameOver) {
+        this.gameOver = gameOver;
+    }
+
+    private Boolean gameOver = false;
 
     public ChessGame() {
         this.board.resetBoard();
