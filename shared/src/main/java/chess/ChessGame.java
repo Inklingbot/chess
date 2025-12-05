@@ -31,14 +31,6 @@ public class ChessGame {
         return teamColor;
     }
 
-    public TeamColor getTeamColor() {
-        return teamColor;
-    }
-
-    public void setTeamColor(TeamColor teamColor) {
-        this.teamColor = teamColor;
-    }
-
     /**
      * Set's which teams turn it is
      *
@@ -104,12 +96,12 @@ public class ChessGame {
             return false;
         }
         ChessGame chessGame = (ChessGame) o;
-        return Objects.equals(getBoard(), chessGame.getBoard()) && getTeamColor() == chessGame.getTeamColor();
+        return Objects.equals(board, chessGame.board) && teamColor == chessGame.teamColor;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getBoard(), getTeamColor());
+        return Objects.hash(board, teamColor);
     }
 
     /**

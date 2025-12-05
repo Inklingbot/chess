@@ -1,5 +1,6 @@
 package server.websocket;
 
+import chess.ChessGame;
 import chess.ChessMove;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
@@ -25,6 +26,8 @@ import static websocket.messages.ServerMessage.ServerMessageType.*;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     private final Gson gson = new Gson();
+    boolean playerResigned = false;
+    boolean mateReached = false;
 
     private final ConnectionManager connections = new ConnectionManager();
     GameDAO gameDAO;
@@ -64,31 +67,57 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void makeMove(ChessMove move, String authToken, Integer gameID, Session session) throws IOException {
         try {
-            if (authDAO.getAuth(authToken) != null) {
+            //first check if they previously checkmated
+            if (mateReached) {
+                var errorCheckmate = new ErrorMessage("You cannot move anymore, a player has won the game!");
+                connections.show(session, errorCheckmate);
+            }
+            //then check if a player has currently resigned
+            else if (playerResigned) {
+                var resignedMessage = new ErrorMessage("A player has resigned, you cannot move right now.");
+                connections.show(session, resignedMessage);
+
+            }
+            //to actually make a move, first check that they are a real user
+            else if (authDAO.getAuth(authToken) != null) {
+                //grab the user and the game
+                AuthData auth = authDAO.getAuth(authToken);
+                String user = auth.username();
                 GameData gameData = gameDAO.getGame(gameID);
-                //Create a variable that will load the game
+                ChessGame currGame = gameData.chessGame();
+                //if they're check/stalemated
+                if (currGame.isInCheckmate(ChessGame.TeamColor.WHITE) ||
+                        currGame.isInCheckmate(ChessGame.TeamColor.BLACK) ||
+                        currGame.isInStalemate(ChessGame.TeamColor.WHITE) ||
+                        currGame.isInStalemate(ChessGame.TeamColor.BLACK)) {
+                    mateReached = true;
+                    var errorCheckmate = new ErrorMessage("You cannot move anymore, a player has won the game!");
+                    connections.show(session, errorCheckmate);
+                    return;
+                }
+                //make the move
                 gameData.chessGame().makeMove(move);
-
-
+                gameDAO.updateGame(gameData.chessGame(), gameID);
                 String game = gson.toJson(gameData);
                 var notification = new LoadGame(game);
                 connections.broadcast(null, notification);
-
+                var moveNotify = new Notification(user + " made move " + move.toString());
+                connections.broadcast(session, moveNotify);
             }
+
             else {
-                ServerMessage notification = new ErrorMessage("This didn't work");
+                ServerMessage notification = new ErrorMessage("This didn't work, but ngl I don't know why bro");
                 connections.broadcast(null, notification);
             }
-
-            //Send the Message to the Client
-
         }
-        catch (InvalidMoveException i) {
-
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
+        catch (DataAccessException e) {
+            var dataNotStored = new ErrorMessage("You might not believe me," +
+                    " but the data here is corrupted or not stored?");
+            connections.show(session, dataNotStored);
+        } catch (InvalidMoveException e) {
+            var wrongMove = new ErrorMessage("This is not a valid move, Genevieve.");
+            connections.show(session, wrongMove);
         }
-
     }
 
     private void connect(String authToken, Integer gameID, Session session) throws IOException {
@@ -126,25 +155,37 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private void exit(String authToken, Integer gameID, Session session) throws IOException {
         connections.remove(session);
         //How do I send a specific message, like the "Player left the game?"
-        connections.broadcast(null, new Notification("Player left the game."));
+        connections.broadcast(session, new Notification("Player left the game."));
     }
 
     private void resign(String authToken, Integer gameID, Session session) throws IOException {
-        //How do I send a message that says "Player resigned, Player Wins!"
         try {
-            if (authDAO.getAuth(authToken) != null) {
+            if (authDAO.getAuth(authToken) != null && !playerResigned) {
                 GameData game = gameDAO.getGame(gameID);
-                connections.broadcast(null, new Notification("Player resigned"));
+                String username = authDAO.getAuth(authToken).username();
+                connections.broadcast(null, new Notification(username + " resigned"));
                 connections.remove(session);
+                playerResigned = true;
                 //Somehow remove the player
+            }
+            else if (playerResigned) {
+                connections.show(session, new ErrorMessage("You cannot resign!"));
+            }
+            else {
+                connections.show(session, new ErrorMessage("You cannot resign!"));
             }
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
-        var notification = new ErrorMessage("This isn't working");
-        //Send the Message to the Client
-        connections.show(session, notification);
     }
+
+
+}
+
+
+
+
+
 
 //    public void makeNoise(String petName, String sound) throws ResponseException {
 //        try {
@@ -155,4 +196,3 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 //            throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
 //        }
 //    }
-}
