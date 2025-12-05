@@ -42,10 +42,10 @@ public class GameplayUI {
             client.WsEchoClient();
             client.send(new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID));
             scanner = new Scanner(System.in);
-            System.out.print("Welcome to the game!");
+            System.out.print("Welcome to the game!\n");
+            updateGameInUI();
             System.out.println(redraw());
 
-            updateGameInUI();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -57,7 +57,7 @@ public class GameplayUI {
             System.out.println(printPrompt());
             boolean leave = false;
             String line = scanner.nextLine();
-            if (Objects.equals(line, "logout")) {
+            if (line.equalsIgnoreCase("leave")) {
                 leave = true;
             }
             try {
@@ -120,13 +120,13 @@ public class GameplayUI {
         }
 
         return switch (cmd) {
-            case "help" -> printPrompt();
+            case "help" -> "";
             case "redraw" -> redraw();
             case "leave" -> leave();
             case "make" -> move(params[1], params[2]);
             case "resign" -> resign();
             case "highlight" -> legals(params[2]);
-            default -> "";
+            default -> "Invalid command.";
         };
     }
 
@@ -144,7 +144,7 @@ public class GameplayUI {
                         "- Make a valid move on your turn\n" +
                         SET_TEXT_COLOR_GREEN + "Resign " + SET_TEXT_COLOR_WHITE +
                         "- give up and forfeit the game.\n" +
-                        SET_TEXT_COLOR_GREEN + "Highlight Legal Moves <piecePos.>" + SET_TEXT_COLOR_WHITE +
+                        SET_TEXT_COLOR_GREEN + "Highlight Legal Moves a-h1-8" + SET_TEXT_COLOR_WHITE +
                         "- show what move a piece can make\n";
 
 
@@ -202,7 +202,8 @@ public class GameplayUI {
         ChessMove move = new ChessMove(position1, position2, promotionPiece);
         MakeMoveCommand moving = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, move);
         client.send(moving);
-        return("Move made.");
+        System.out.println("Move made.\n");
+        return redraw();
     }
 
     public String resign() throws IOException {
@@ -224,31 +225,31 @@ public class GameplayUI {
     }
 
     public ChessPosition parseMove (String pos) {
-        String row = pos.substring(0, 1);
-        String col = pos.substring(1, 2);
-        if (row.equalsIgnoreCase("a")) {
-            row = "1";
+        String col = pos.substring(0, 1);
+        String row = pos.substring(1, 2);
+        if (col.equalsIgnoreCase("a")) {
+            col = "1";
         }
-        else if (row.equalsIgnoreCase("b")) {
-            row = "2";
+        else if (col.equalsIgnoreCase("b")) {
+            col = "2";
         }
-        else if (row.equalsIgnoreCase("c")) {
-            row = "3";
+        else if (col.equalsIgnoreCase("c")) {
+            col = "3";
         }
-        else if (row.equalsIgnoreCase("d")) {
-            row = "4";
+        else if (col.equalsIgnoreCase("d")) {
+            col = "4";
         }
-        else if (row.equalsIgnoreCase("e")) {
-            row = "5";
+        else if (col.equalsIgnoreCase("e")) {
+            col = "5";
         }
-        else if (row.equalsIgnoreCase("f")) {
-            row = "6";
+        else if (col.equalsIgnoreCase("f")) {
+            col = "6";
         }
-        else if (row.equalsIgnoreCase("g")) {
-            row = "7";
+        else if (col.equalsIgnoreCase("g")) {
+            col = "7";
         }
-        else if (row.equalsIgnoreCase("h")) {
-            row = "8";
+        else if (col.equalsIgnoreCase("h")) {
+            col = "8";
         }
 
         return new ChessPosition(Integer.parseInt(row), Integer.parseInt(col));

@@ -15,6 +15,7 @@ import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGame;
@@ -55,7 +56,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             UserGameCommand message = new Gson().fromJson(ctx.message(), UserGameCommand.class);
             switch (message.getCommandType()) {
                 case CONNECT -> connect(message.getAuthToken(), message.getGameID(), ctx.session);
-                case MAKE_MOVE -> makeMove(message.getMove(), message.getAuthToken(), message.getGameID(), ctx.session);
+                case MAKE_MOVE -> {
+                    MakeMoveCommand move = new Gson().fromJson(ctx.message(), MakeMoveCommand.class);
+                    makeMove(move.getMove(), move.getAuthToken(), move.getGameID(), ctx.session);
+                }
                 case LEAVE -> exit(message.getAuthToken(), message.getGameID(), ctx.session);
                 case RESIGN -> resign(message.getAuthToken(), message.getGameID(), ctx.session);
             }

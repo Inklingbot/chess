@@ -98,7 +98,7 @@ public class PostLoginUI {
                 case "observe" -> observe(params[0]);
                 case "logout" -> logout();
                 case "quit" -> quit();
-                default -> "";
+                default -> "Invalid Command.";
             };
 
 
@@ -106,7 +106,8 @@ public class PostLoginUI {
 
     String create(String name) throws ResponseException {
         CreateGameResult result = facade.create(name, authToken);
-        return  "Successfully created the game!\n";
+        System.out.println("Successfully created the game!\n");
+        return list();
     }
 
     String list() throws ResponseException {
@@ -135,7 +136,7 @@ public class PostLoginUI {
             throw new ResponseException("This is not a valid gameID!");
         }
 
-        return "Thank you for playing!";
+        return "Thank you for playing!\n";
     }
 
     public String observe(String gameID) throws ResponseException {
@@ -146,10 +147,10 @@ public class PostLoginUI {
             ui.run();
         }
         else {
-            throw new ResponseException("This is not a valid gameID!");
+            throw new ResponseException("This is not a valid gameID.\n");
         }
 
-        return "Thank you for observing.";
+        return "Thank you for observing.\n";
     }
 
     public String logout() throws ResponseException {
@@ -179,39 +180,6 @@ public class PostLoginUI {
                  SET_TEXT_COLOR_MAGENTA + "quit " + SET_TEXT_COLOR_WHITE + "- quit the program altogether\n" +
                  SET_TEXT_COLOR_MAGENTA + "help " + SET_TEXT_COLOR_WHITE + "- display this screen\n";
 
-
-    public static final String BOARD_INITIAL = SET_BG_COLOR_DARK_GREY + "  a   b  c   d   e   f  g  h" + EMPTY +
-            "\n" + "8" + SET_BG_COLOR_WHITE + SET_TEXT_COLOR_RED
-            + BLACK_ROOK + SET_BG_COLOR_BLACK + BLACK_KNIGHT + SET_BG_COLOR_WHITE + BLACK_BISHOP + SET_BG_COLOR_BLACK
-            + BLACK_QUEEN + SET_BG_COLOR_WHITE + BLACK_KING + SET_BG_COLOR_BLACK + BLACK_BISHOP + SET_BG_COLOR_WHITE
-            + BLACK_KNIGHT + SET_BG_COLOR_BLACK + BLACK_ROOK + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "8\n7"
-            + SET_TEXT_COLOR_RED + SET_BG_COLOR_BLACK
-            + BLACK_PAWN + SET_BG_COLOR_WHITE + BLACK_PAWN + SET_BG_COLOR_BLACK + BLACK_PAWN + SET_BG_COLOR_WHITE
-            + BLACK_PAWN + SET_BG_COLOR_BLACK + BLACK_PAWN + SET_BG_COLOR_WHITE + BLACK_PAWN + SET_BG_COLOR_BLACK
-            + BLACK_PAWN + SET_BG_COLOR_WHITE + BLACK_PAWN + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "7\n6"
-            + SET_BG_COLOR_WHITE + SET_TEXT_COLOR_RED
-            + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY
-            + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK
-            + EMPTY + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "6\n5" + SET_TEXT_COLOR_RED + SET_BG_COLOR_BLACK
-            + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY
-            + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE
-            + EMPTY + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "5\n4" + SET_TEXT_COLOR_RED + SET_BG_COLOR_WHITE
-            + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY
-            + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK
-            + EMPTY + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "4\n3" + SET_TEXT_COLOR_RED + SET_BG_COLOR_BLACK
-            + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY
-            + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_BLACK + EMPTY + SET_BG_COLOR_WHITE
-            + EMPTY + SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "3\n2" + SET_BG_COLOR_WHITE + WHITE_PAWN
-            + SET_BG_COLOR_BLACK
-            + WHITE_PAWN + SET_BG_COLOR_WHITE + WHITE_PAWN + SET_BG_COLOR_BLACK + WHITE_PAWN +SET_BG_COLOR_WHITE
-            + WHITE_PAWN + SET_BG_COLOR_BLACK + WHITE_PAWN +SET_BG_COLOR_WHITE + WHITE_PAWN + SET_BG_COLOR_BLACK
-            + WHITE_PAWN + SET_BG_COLOR_DARK_GREY + "2\n1" + SET_BG_COLOR_BLACK + WHITE_ROOK + SET_BG_COLOR_WHITE
-            + WHITE_KNIGHT + SET_BG_COLOR_BLACK + WHITE_BISHOP + SET_BG_COLOR_WHITE + WHITE_QUEEN + SET_BG_COLOR_BLACK
-            + WHITE_KING + SET_BG_COLOR_WHITE + WHITE_BISHOP + SET_BG_COLOR_BLACK + WHITE_KNIGHT + SET_BG_COLOR_WHITE
-            + WHITE_ROOK + SET_BG_COLOR_DARK_GREY + "1\n" + "  a   b  c   d   e  f   g  h" + EMPTY + "\n";
-
-
-
     public static String drawBoardWhite(ChessBoard board, Collection<ChessMove> moves) {
         StringBuilder s = new StringBuilder();
         //Draws the Letters
@@ -221,7 +189,7 @@ public class PostLoginUI {
         for (int j = 8; j > 0; j--) {
             s.append(j);
             for (int i = 1; i <=8; i++) {
-                    s.append(pieceCreator(board, i, j));
+                    s.append(pieceCreator(board, i, j, moves));
             }
             s.append(SET_BG_COLOR_DARK_GREY).append(SET_TEXT_COLOR_WHITE).append(j).append("\n");
         }
@@ -238,10 +206,11 @@ public class PostLoginUI {
         s.append(SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + "  " +"a" + "  " + "b" + "  " + "c" + "  " + "d"
                 + "  " + "e" + "  " + "f" + "  " + "g" + "  " + "h"  + EMPTY +
                 "\n");
+
         for (int j = 1; j<= 8; j++) {
             s.append(j);
             for (int i = 1; i <=8; i++) {
-                s.append(pieceCreator(board, i, j));
+                s.append(pieceCreator(board, i, j, moves));
             }
             s.append(SET_BG_COLOR_DARK_GREY).append(SET_TEXT_COLOR_WHITE).append(j).append("\n");
         }
@@ -251,12 +220,25 @@ public class PostLoginUI {
         return s.toString();
     }
 
-    public static String pieceCreator(ChessBoard board, int i, int j) {
+    public static String pieceCreator(ChessBoard board, int i, int j, Collection<ChessMove> moves) {
         String s = "";
+        boolean highlight = false;
+        ChessPosition position = new ChessPosition(i, j);
+        if (moves != null) {
+            for (ChessMove move : moves) {
+                if (move.endPosition() == position) {
+                    highlight = true;
+                    break;
+                }
+            }
+        }
 
 
         //What space is it
-        if (j % 2 == 0) {
+        if (highlight) {
+            s+= SET_BG_COLOR_YELLOW;
+        }
+        else if (j % 2 == 0) {
             if (i % 2 == 0) {
                 s+= SET_BG_COLOR_BLACK;
             }
