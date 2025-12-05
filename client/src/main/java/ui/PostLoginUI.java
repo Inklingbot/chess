@@ -130,27 +130,28 @@ public class PostLoginUI {
         if (!(gameIDInt > ids.size())) {
             String gameIDDb = ids.get(gameIDInt).toString();
             facade.join(playerColor, gameIDDb, authToken);
+            GameplayUI ui =  new GameplayUI(authToken, gameIDInt, playerColor);
+            ui.run();
         }
         else {
             throw new ResponseException("This is not a valid gameID!");
         }
-        ChessBoard board = new ChessBoard();
-        board.resetBoard();
 
-        //display the board (starting state)
-        if (Objects.equals(playerColor, "white")) {
-            return drawBoardWhite(board);
-        }
-        else {
-            return drawBoardBlack(board);
-        }
-
+        return "Thank you for playing!";
     }
 
-    public String observe(String gameName) {
+    public String observe(String gameID) throws ResponseException {
+        int gameIDInt = Integer.parseInt(gameID);
+        if (!(gameIDInt > ids.size())) {
+            String gameIDDb = ids.get(gameIDInt).toString();
+            GameplayUI ui = new GameplayUI(authToken, gameIDInt, null);
+            ui.run();
+        }
+        else {
+            throw new ResponseException("This is not a valid gameID!");
+        }
 
-        //don't do anything??? Maybe find the game?
-        return BOARD_INITIAL;
+        return "Thank you for observing.";
     }
 
     public String logout() throws ResponseException {
@@ -213,7 +214,7 @@ public class PostLoginUI {
 
 
 
-    public String drawBoardWhite(ChessBoard board) {
+    public static String drawBoardWhite(ChessBoard board) {
         StringBuilder s = new StringBuilder();
         //Draws the Letters
         s.append(SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + "  " +"a" + "  " + "b" + "  " + "c" + "  " + "d"
@@ -232,7 +233,7 @@ public class PostLoginUI {
         return s.toString();
     }
 
-    public String drawBoardBlack(ChessBoard board) {
+    public static String drawBoardBlack(ChessBoard board) {
         StringBuilder s = new StringBuilder();
         //Draws the
         //"  a   b  c   d   e   f  g  h"
@@ -252,7 +253,7 @@ public class PostLoginUI {
         return s.toString();
     }
 
-    public String pieceCreator(ChessBoard board, int i, int j) {
+    public static String pieceCreator(ChessBoard board, int i, int j) {
         String s = "";
 
 
