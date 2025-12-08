@@ -18,17 +18,18 @@ import static ui.EscapeSequences.*;
 import static ui.EscapeSequences.SET_TEXT_COLOR_WHITE;
 
 import server.ServerFacade;
-import server.WSEchoClient;
+import server.WebSocketFacade;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
 
 public class GameplayUI {
     String authToken;
-    WSEchoClient client = new WSEchoClient();
+    WebSocketFacade facadeWeb;
     Integer gameID;
     String playerColor;
-    private final ServerFacade facade;
     GameData game;
+    ServerFacade facade;
     public GameplayUI(String authToken, Integer gameID, String playerColor, ServerFacade facade) {
         this.authToken = authToken;
         this.gameID = gameID;
@@ -39,8 +40,10 @@ public class GameplayUI {
     public void run() {
         Scanner scanner;
         try {
-            client.WsEchoClient();
-            client.send(new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID));
+            facadeWeb = new WebSocketFacade("localhost:8080",
+                            new ServerMessage   (ServerMessage.ServerMessageType.NOTIFICATION, "Connected"));
+
+            facadeWeb.joinGame(authToken, gameID);
             scanner = new Scanner(System.in);
             System.out.print("Welcome to the game!\n");
             updateGameInUI();
@@ -160,13 +163,12 @@ public class GameplayUI {
         }
     }
 
-    public String leave() throws IOException {
-        UserGameCommand leave = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
-        client.send(leave);
+    public String leave() throws IOException, ResponseException {
+        facadeWeb.leaveGame(authToken, gameID);
         return ("You have left the game.");
     }
 
-    public String move(String startPos, String endPos) throws IOException {
+    public String move(String startPos, String endPos) throws IOException, ResponseException {
         ChessPosition position1 =  parseMove(startPos);
         ChessPosition position2 = parseMove(endPos);
         ChessPiece.PieceType promotionPiece = null;
@@ -200,15 +202,13 @@ public class GameplayUI {
             scanner2.close();
         }
         ChessMove move = new ChessMove(position1, position2, promotionPiece);
-        MakeMoveCommand moving = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, move);
-        client.send(moving);
+        facadeWeb.makeMove(move, authToken, gameID);
         System.out.println("Move made.\n");
         return redraw();
     }
 
-    public String resign() throws IOException {
-        UserGameCommand resign = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
-        client.send(resign);
+    public String resign() throws IOException, ResponseException {
+        facadeWeb.resign(authToken, gameID);
         return ("You have resigned.");
     }
 
