@@ -90,14 +90,14 @@ public class GameplayUI implements NotificationHandler {
         System.out.println();
     }
 
-    private void updateGameInUI() throws ResponseException {
-        ListGamesResult listResult = facade.list(authToken);
-        for (GameData game : listResult.games()) {
-            if (gameID == game.gameID()) {
-                this.game = game;
-            }
-        }
-    }
+//    private void updateGameInUI() throws ResponseException {
+//        ListGamesResult listResult = facade.list(authToken);
+//        for (GameData game : listResult.games()) {
+//            if (gameID == game.gameID()) {
+//                this.game = game;
+//            }
+//        }
+//    }
 
     public String eval(String input) throws ResponseException, IOException {
         String[] tokens = input.toLowerCase().split(" ");
@@ -218,8 +218,8 @@ public class GameplayUI implements NotificationHandler {
         ChessMove move = new ChessMove(position1, position2, promotionPiece);
         clientWebsocketFacade.makeMove(move, authToken, gameID);
         System.out.println("Move made.\n");
-        updateGameInUI();
-        return redraw();
+//        updateGameInUI();
+        return "";
     }
 
     public String resign() throws ResponseException {
