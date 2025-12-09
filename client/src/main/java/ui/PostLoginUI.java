@@ -34,7 +34,7 @@ public class PostLoginUI {
 
         while (true) {
             assert result != null;
-            if (result.equals("quit")) break;
+            if (result.equals("quit")) {break;};
             printPrompt();
             boolean leave = false;
             String line = scanner.nextLine();
@@ -117,7 +117,8 @@ public class PostLoginUI {
         builda.append("List of Games: \n");
         for (GameData game : result.games()) {
             ids.put(publicId, game.gameID());
-            builda.append(publicId).append(" Game Name: ").append(game.gameName()).append(", White: ").append(game.whiteUsername()).append(", Black: ").append(game.blackUsername()).append("\n");
+            builda.append(publicId).append(" Game Name: ").append(game.gameName()).append(", White: ")
+                    .append(game.whiteUsername()).append(", Black: ").append(game.blackUsername()).append("\n");
             publicId++;
         }
         return builda.toString();

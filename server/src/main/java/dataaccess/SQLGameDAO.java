@@ -135,37 +135,7 @@ public class SQLGameDAO implements GameDAO{
         }
     }
 
-//    @Override
-//    public void updateGameUserLeave(String color, String username, int gameID, GameData data) throws DataAccessException {
-//
-//        String deleteStatement = "DELETE FROM game WHERE gameID = " + "?;";
-//        try (var conn = DatabaseManager.getConnection()) {
-//            try (var preparedStatement = conn.prepareStatement(statement)) {
-//                preparedStatement.setInt(1, gameID);
-//                ResultSet rs = preparedStatement.executeQuery();
-//                if (rs.next()) {
-//                    String whitesUsername = rs.getString(2);
-//                    String blacksUsername = rs.getString(3);
-//                    String obtainedGameName = rs.getString(4);
-//                    String obtainedJSONString = rs.getString(5);
-//
-//                    if (Objects.equals(color.toUpperCase(), "BLACK")) {
-//                        blacksUsername = username;
-//                        insertColorName(whitesUsername, blacksUsername, gameID, obtainedJSONString, obtainedGameName);
-//                    }
-//                    else if (Objects.equals(color.toUpperCase(), "WHITE")) {
-//                        whitesUsername = username;
-//                        insertColorName(whitesUsername, blacksUsername, gameID, obtainedJSONString, obtainedGameName);
-//                    }
-//                }
-//            }
-//        } catch (SQLException e) {
-//            throw new ResponseException("Error: Unable to configure database" + e.getMessage());
-//        }
-//        catch (DataAccessException d) {
-//            throw new DataAccessException("Error: The server is not running!");
-//        }
-//    }
+
 
     public void insertColorName (String whitesUsername, String blacksUsername, int gameID, String data, String gameName)
             throws DataAccessException {

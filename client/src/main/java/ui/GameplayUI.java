@@ -51,9 +51,6 @@ public class GameplayUI implements NotificationHandler {
             clientWebsocketFacade.joinGame(authToken, gameID, playerColor);
             scanner = new Scanner(System.in);
             System.out.print("Welcome to the game!\n");
-//            updateGameInUI();
-//            System.out.println(redraw());
-//            System.out.println(redraw());
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -62,7 +59,7 @@ public class GameplayUI implements NotificationHandler {
         var result = "";
         while (true) {
             assert result != null;
-            if (result.equals("quit")) break;
+            if (result.equals("quit")) {break;};
             System.out.println(printPrompt());
             boolean leave = false;
             String line = scanner.nextLine();
@@ -164,7 +161,6 @@ public class GameplayUI implements NotificationHandler {
 
     public String redraw() {
         try {
-//            updateGameInUI();
             if (Objects.equals(playerColor, "white")) {
                 return PostLoginUI.drawBoardWhite(chessGame.getBoard(), null);
             }
@@ -278,19 +274,19 @@ public class GameplayUI implements NotificationHandler {
     @Override
     public void notify(ServerMessage newMessage, String message) {
         if (newMessage.getType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-            LoadGame outMessage = gson.fromJson(message, LoadGame.class);
+            LoadGame outMessage = GSON.fromJson(message, LoadGame.class);
 
-            ChessGame game = gson.fromJson(outMessage.getGame(), ChessGame.class);
+            ChessGame game = GSON.fromJson(outMessage.getGame(), ChessGame.class);
             this.game = new GameData(0, "white", "black", "name", game);
             this.chessGame = game;
             System.out.println(redraw());
         }
         else if (newMessage.getType() == ServerMessage.ServerMessageType.ERROR) {
-            ErrorMessage outMessage = gson.fromJson(message, ErrorMessage.class);
+            ErrorMessage outMessage = GSON.fromJson(message, ErrorMessage.class);
             System.out.println(SET_TEXT_COLOR_RED + outMessage.toString());
         }
         else if (newMessage.getType() == ServerMessage.ServerMessageType.NOTIFICATION){
-            Notification outMessage = gson.fromJson(message, Notification.class);
+            Notification outMessage = GSON.fromJson(message, Notification.class);
             System.out.println(SET_TEXT_COLOR_MAGENTA + outMessage.toString());
         }
     }
