@@ -1,9 +1,5 @@
 package websocket.messages;
 
-import chess.ChessGame;
-import model.GameData;
-
-import java.util.Objects;
 import com.google.gson.Gson;
 
 /**
@@ -13,14 +9,14 @@ import com.google.gson.Gson;
  * methods.
  */
 public class ServerMessage {
-    ServerMessageType type;
+    ServerMessageType serverMessageType;
 
     public ServerMessage(ServerMessageType type) {
-        this.type = type;
+        this.serverMessageType = type;
     }
 
-    public ServerMessageType getType() {
-        return type;
+    public ServerMessageType getServerMessageType() {
+        return serverMessageType;
     }
 
     public enum ServerMessageType {

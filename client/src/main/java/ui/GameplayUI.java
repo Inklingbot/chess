@@ -6,7 +6,6 @@ import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import model.GameData;
-import model.ListGamesResult;
 import server.NotificationHandler;
 import server.ResponseException;
 
@@ -273,7 +272,7 @@ public class GameplayUI implements NotificationHandler {
 
     @Override
     public void notify(ServerMessage newMessage, String message) {
-        if (newMessage.getType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+        if (newMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
             LoadGame outMessage = GSON.fromJson(message, LoadGame.class);
 
             ChessGame game = GSON.fromJson(outMessage.getGame(), ChessGame.class);
@@ -281,11 +280,11 @@ public class GameplayUI implements NotificationHandler {
             this.chessGame = game;
             System.out.println(redraw());
         }
-        else if (newMessage.getType() == ServerMessage.ServerMessageType.ERROR) {
+        else if (newMessage.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
             ErrorMessage outMessage = GSON.fromJson(message, ErrorMessage.class);
             System.out.println(SET_TEXT_COLOR_RED + outMessage.toString());
         }
-        else if (newMessage.getType() == ServerMessage.ServerMessageType.NOTIFICATION){
+        else if (newMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION){
             Notification outMessage = GSON.fromJson(message, Notification.class);
             System.out.println(SET_TEXT_COLOR_MAGENTA + outMessage.toString());
         }
