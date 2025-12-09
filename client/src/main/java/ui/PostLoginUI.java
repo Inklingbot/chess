@@ -197,30 +197,47 @@ public class PostLoginUI {
 
 
         StringBuilder s = new StringBuilder();
-        s.append(SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + "  " +"a" + "  " + "b" + "  " + "c" + "  " + "d"
-                + "  " + "e" + "  " + "f" + "  " + "g" + "  " + "h"  + EMPTY +
-                "\n");
+
         if (increment) {
+            s.append(SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + "  " +"h" + "  " + "g" + "  " + "f" + "  " + "e"
+                    + "  " + "d" + "  " + "c" + "  " + "b" + "  " + "a"  + EMPTY +
+                    "\n");
             for (int j = start;j <= end; j++) {
-                callPieceCreator(board, moves, s, j);
+                 callPieceCreator(board, moves, s, j, increment);
             }
+            s.append(SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + "  " +"h" + "  " + "g" + "  " + "f" + "  " + "e"
+                    + "  " + "d" + "  " + "c" + "  " + "b" + "  " + "a"  + EMPTY +
+                    "\n");
+
         }
         else {
+            s.append(SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + "  " +"a" + "  " + "b" + "  " + "c" + "  " + "d"
+                    + "  " + "e" + "  " + "f" + "  " + "g" + "  " + "h"  + EMPTY +
+                    "\n");
             for (int j = start; j >= end; j--) {
-                callPieceCreator(board, moves, s, j);
+                callPieceCreator(board, moves, s, j, increment);
             }
+            s.append(SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + "  " +"a" + "  " + "b" + "  " + "c" + "  " + "d"
+                    + "  " + "e" + "  " + "f" + "  " + "g" + "  " + "h"  + EMPTY +
+                    "\n");
         }
-        s.append(SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + "  " +"a" + "  " + "b" + "  " + "c" + "  " + "d"
-                + "  " + "e" + "  " + "f" + "  " + "g" + "  " + "h"  + EMPTY +
-                "\n");
+
         return s.toString();
     }
 
-    private static void callPieceCreator(ChessBoard board, Collection<ChessMove> moves, StringBuilder s, int j) {
+    private static void callPieceCreator(ChessBoard board, Collection<ChessMove> moves, StringBuilder s, int j, boolean increment) {
         s.append(j);
-        for (int i = 1; i <=8; i++) {
-            s.append(pieceCreator(board, i, j, moves));
+        if (increment) {
+            for (int i = 8; i >=1; i--) {
+                s.append(pieceCreator(board, i, j, moves));
+            }
         }
+        else {
+            for (int i = 1; i <=8; i++) {
+                s.append(pieceCreator(board, i, j, moves));
+            }
+        }
+
         s.append(SET_BG_COLOR_DARK_GREY).append(SET_TEXT_COLOR_WHITE).append(j).append("\n");
     }
 

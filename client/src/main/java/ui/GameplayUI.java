@@ -66,7 +66,7 @@ public class GameplayUI implements NotificationHandler {
                 leave = true;
             }
             try {
-                result = eval(line);
+                result = eval(line, scanner);
                 if (result != null) {
                     System.out.print(SET_TEXT_COLOR_BLUE + result);
                 }
@@ -76,6 +76,9 @@ public class GameplayUI implements NotificationHandler {
             }
             catch(NumberFormatException n) {
                 System.out.println("Please use the format \" 1 \" for the game number.");
+            }
+            catch(NullPointerException l) {
+                System.out.println("There is no piece here!");
             }
             catch (Throwable e) {
                 var msg = e.toString();
@@ -89,7 +92,7 @@ public class GameplayUI implements NotificationHandler {
         System.out.println();
     }
 
-    public String eval(String input) throws ResponseException, IOException {
+    public String eval(String input, Scanner scanner) throws ResponseException, IOException {
         String[] tokens = input.toLowerCase().split(" ");
         String cmd = (tokens.length > 0) ? tokens[0] : "help";
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
@@ -125,7 +128,7 @@ public class GameplayUI implements NotificationHandler {
             case "redraw" -> redraw();
             case "leave" -> leave();
             case "move" -> move(params[0], params[1]);
-            case "resign" -> resign();
+            case "resign" -> resign(scanner);
             case "highlight" -> legals(params[0]);
             default -> "Invalid command.";
         };
@@ -203,9 +206,19 @@ public class GameplayUI implements NotificationHandler {
         return "";
     }
 
-    public String resign() throws ResponseException {
-        clientWebsocketFacade.resign(authToken, gameID);
-        return ("You have resigned.\n");
+    public String resign(Scanner scanner) throws ResponseException {
+            System.out.println("Are you sure you want to resign? (y/n)");
+            String resign = scanner.nextLine();
+            if (resign.equalsIgnoreCase("y")) {
+                clientWebsocketFacade.resign(authToken, gameID);
+                return ("You have resigned.\n");
+            }
+            else {
+
+                return ("Game will continue!\n");
+            }
+
+
     }
 
     public String legals(String pos) {
