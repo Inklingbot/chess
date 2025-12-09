@@ -287,11 +287,11 @@ public class GameplayUI implements NotificationHandler {
         }
         else if (newMessage.getType() == ServerMessage.ServerMessageType.ERROR) {
             ErrorMessage outMessage = gson.fromJson(message, ErrorMessage.class);
-            System.out.println(SET_TEXT_COLOR_RED + outMessage);
+            System.out.println(SET_TEXT_COLOR_RED + outMessage.toString());
         }
         else if (newMessage.getType() == ServerMessage.ServerMessageType.NOTIFICATION){
             Notification outMessage = gson.fromJson(message, Notification.class);
-            System.out.println(SET_TEXT_COLOR_MAGENTA + outMessage);
+            System.out.println(SET_TEXT_COLOR_MAGENTA + outMessage.toString());
         }
     }
 }

@@ -124,6 +124,23 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 connections.broadcast(null, notification, gameID);
                 var moveNotify = new Notification(user + " made move " + move);
                 connections.broadcast(session, moveNotify, gameID);
+
+                if (currGame.isInCheckmate(WHITE)) {
+                    var notify = new Notification(gameData.whiteUsername() + "is Checkmated.");
+                    connections.broadcast(null, notify, gameID);
+                }
+                else if (currGame.isInCheckmate(BLACK)) {
+                    var notify = new Notification(gameData.blackUsername() + "is Checkmated.");
+                    connections.broadcast(null, notify, gameID);
+                }
+                else if (currGame.isInCheck(WHITE)) {
+                    var notify = new Notification(gameData.whiteUsername() + "is in check.");
+                    connections.broadcast(null, notify, gameID);
+                }
+                else if (currGame.isInCheck(BLACK)) {
+                    var notify = new Notification(gameData.blackUsername() + "is in check.");
+                    connections.broadcast(null, notify, gameID);
+                }
             }
 
             else {
@@ -183,9 +200,18 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void exit(String authToken, Integer gameID, Session session) throws IOException {
+        AuthData auth = null;
+        try {
+            auth = authDAO.getAuth(authToken);
+        } catch (DataAccessException e) {
+            var notification = new ErrorMessage("You're not a real user!");
+            //Send the Message to the Client
+            connections.show(session, notification, gameID);
+        }
+        String user = auth.username();
         connections.remove(session, gameID);
         //How do I send a specific message, like the "Player left the game?"
-        connections.broadcast(session, new Notification("Player left the game."), gameID);
+        connections.broadcast(session, new Notification(user + " left the game."), gameID);
 
         try {
             String username = authDAO.getAuth(authToken).username();
@@ -209,19 +235,21 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             if (authDAO.getAuth(authToken) != null && !resignation) {
                 GameData game = gameDAO.getGame(gameID);
                 String username = authDAO.getAuth(authToken).username();
+                //Check if it's an observer resigning
                 if (!Objects.equals(game.whiteUsername(), username) &&
                         !Objects.equals(game.blackUsername(), username)) {
                     var observerIsDumb = new ErrorMessage("You're an Observer, you cannot resign!");
                     connections.show(session, observerIsDumb, gameID);
                     return;
                 }
-                connections.broadcast(null, new Notification(username + " resigned"), gameID);
-                connections.remove(session, gameID);
-                resignChecker.put(gameID, true);
-                ChessGame chessGame = game.chessGame();
-                chessGame.setGameOver(true);
-                gameDAO.updateGame(chessGame, gameID);
-                //Somehow remove the player
+                else {
+                    connections.broadcast(null, new Notification(username + " resigned"), gameID);
+                    connections.remove(session, gameID);
+                    resignChecker.put(gameID, true);
+                    ChessGame chessGame = game.chessGame();
+                    chessGame.setGameOver(true);
+                    gameDAO.updateGame(chessGame, gameID);
+                }
             }
             else if (resignation) {
                 connections.show(session, new ErrorMessage("You cannot resign!"), gameID);

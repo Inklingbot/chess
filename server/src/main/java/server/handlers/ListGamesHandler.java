@@ -36,7 +36,7 @@ public class ListGamesHandler implements Handler {
             ctx.status(401);
         }
         catch(DataAccessException e) {
-            String errorJson = LogOutHandler.createJsonError(gson, "Error: THis data doesn't exist," +
+            String errorJson = LogOutHandler.createJsonError(gson, "Error: This data doesn't exist," +
                     " or we couldn't access it!\n");
             ctx.result(errorJson);
             ctx.status(500);
