@@ -202,26 +202,26 @@ public class PostLoginUI {
                 "\n");
         if (increment) {
             for (int j = start;j <= end; j++) {
-                s.append(j);
-                for (int i = 1; i <=8; i++) {
-                    s.append(pieceCreator(board, i, j, moves));
-                }
-                s.append(SET_BG_COLOR_DARK_GREY).append(SET_TEXT_COLOR_WHITE).append(j).append("\n");
+                callPieceCreator(board, moves, s, j);
             }
         }
         else {
             for (int j = start; j >= end; j--) {
-                s.append(j);
-                for (int i = 1; i <=8; i++) {
-                    s.append(pieceCreator(board, i, j, moves));
-                }
-                s.append(SET_BG_COLOR_DARK_GREY).append(SET_TEXT_COLOR_WHITE).append(j).append("\n");
+                callPieceCreator(board, moves, s, j);
             }
         }
         s.append(SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + "  " +"a" + "  " + "b" + "  " + "c" + "  " + "d"
                 + "  " + "e" + "  " + "f" + "  " + "g" + "  " + "h"  + EMPTY +
                 "\n");
         return s.toString();
+    }
+
+    private static void callPieceCreator(ChessBoard board, Collection<ChessMove> moves, StringBuilder s, int j) {
+        s.append(j);
+        for (int i = 1; i <=8; i++) {
+            s.append(pieceCreator(board, i, j, moves));
+        }
+        s.append(SET_BG_COLOR_DARK_GREY).append(SET_TEXT_COLOR_WHITE).append(j).append("\n");
     }
 
     public static String pieceCreator(ChessBoard board, int i, int j, Collection<ChessMove> moves) {
