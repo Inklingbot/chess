@@ -89,15 +89,6 @@ public class GameplayUI implements NotificationHandler {
         System.out.println();
     }
 
-//    private void updateGameInUI() throws ResponseException {
-//        ListGamesResult listResult = facade.list(authToken);
-//        for (GameData game : listResult.games()) {
-//            if (gameID == game.gameID()) {
-//                this.game = game;
-//            }
-//        }
-//    }
-
     public String eval(String input) throws ResponseException, IOException {
         String[] tokens = input.toLowerCase().split(" ");
         String cmd = (tokens.length > 0) ? tokens[0] : "help";
