@@ -58,7 +58,7 @@ public class GameplayUI implements NotificationHandler {
         var result = "";
         while (true) {
             assert result != null;
-            if (result.equals("quit")) {break;};
+            if (result.equals("quit")) {break;}
             System.out.println(printPrompt());
             boolean leave = false;
             String line = scanner.nextLine();
@@ -151,15 +151,7 @@ public class GameplayUI implements NotificationHandler {
 
     public String redraw() {
         try {
-            if (Objects.equals(playerColor, "white")) {
-                return PostLoginUI.drawBoardWhite(chessGame.getBoard(), null);
-            }
-            else if (Objects.equals(playerColor, "black")){
-                return PostLoginUI.drawBoardBlack(chessGame.getBoard(), null);
-            }
-            else {
-                return PostLoginUI.drawBoardWhite(chessGame.getBoard(), null);
-            }
+            return PostLoginUI.drawBoard(game.chessGame().getBoard(), null, playerColor);
         }
         catch(Exception e) {
             System.out.println("There was an exception.");
@@ -208,7 +200,6 @@ public class GameplayUI implements NotificationHandler {
         ChessMove move = new ChessMove(position1, position2, promotionPiece);
         clientWebsocketFacade.makeMove(move, authToken, gameID);
         System.out.println("Move made.\n");
-//        updateGameInUI();
         return "";
     }
 
@@ -220,13 +211,7 @@ public class GameplayUI implements NotificationHandler {
     public String legals(String pos) {
         ChessPosition position = parseMove(pos);
         Collection<ChessMove> moves = game.chessGame().validMoves(position);
-        if (Objects.equals(playerColor, "white")) {
-            return PostLoginUI.drawBoardWhite(game.chessGame().getBoard(), moves);
-        }
-        else if (Objects.equals(playerColor, "black")){
-            return PostLoginUI.drawBoardBlack(game.chessGame().getBoard(), moves);
-        }
-        return "Error?";
+        return PostLoginUI.drawBoard(game.chessGame().getBoard(), moves, playerColor);
     }
 
     public ChessPosition parseMove (String pos) {

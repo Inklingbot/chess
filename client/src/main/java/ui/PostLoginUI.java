@@ -34,7 +34,7 @@ public class PostLoginUI {
 
         while (true) {
             assert result != null;
-            if (result.equals("quit")) {break;};
+            if (result.equals("quit")) {break;}
             printPrompt();
             boolean leave = false;
             String line = scanner.nextLine();
@@ -181,39 +181,42 @@ public class PostLoginUI {
                  SET_TEXT_COLOR_MAGENTA + "quit " + SET_TEXT_COLOR_WHITE + "- quit the program altogether\n" +
                  SET_TEXT_COLOR_MAGENTA + "help " + SET_TEXT_COLOR_WHITE + "- display this screen\n";
 
-    public static String drawBoardWhite(ChessBoard board, Collection<ChessMove> moves) {
-        StringBuilder s = new StringBuilder();
-        //Draws the Letters
-        s.append(SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + "  " +"a" + "  " + "b" + "  " + "c" + "  " + "d"
-                + "  " + "e" + "  " + "f" + "  " + "g" + "  " + "h"  + EMPTY +
-                "\n");
-        for (int j = 8; j > 0; j--) {
-            s.append(j);
-            for (int i = 1; i <=8; i++) {
-                    s.append(pieceCreator(board, i, j, moves));
-            }
-            s.append(SET_BG_COLOR_DARK_GREY).append(SET_TEXT_COLOR_WHITE).append(j).append("\n");
+    public static String drawBoard(ChessBoard board, Collection<ChessMove> moves, String playerColor) {
+        int start = 0;
+        int end = 0;
+        boolean increment = false;
+        if (Objects.equals(playerColor, "black")) {
+            start = 1;
+            end = 8;
+            increment = true;
         }
-        s.append(SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + "  " +"a" + "  " + "b" + "  " + "c" + "  " + "d"
-                + "  " + "e" + "  " + "f" + "  " + "g" + "  " + "h"  + EMPTY +
-                "\n");
-        return s.toString();
-    }
+        else if (Objects.equals(playerColor, "white") || playerColor == null) {
+            start = 8;
+            end = 1;
+        }
 
-    public static String drawBoardBlack(ChessBoard board, Collection<ChessMove> moves) {
+
         StringBuilder s = new StringBuilder();
-        //Draws the
-        //"  a   b  c   d   e   f  g  h"
         s.append(SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + "  " +"a" + "  " + "b" + "  " + "c" + "  " + "d"
                 + "  " + "e" + "  " + "f" + "  " + "g" + "  " + "h"  + EMPTY +
                 "\n");
-
-        for (int j = 1; j<= 8; j++) {
-            s.append(j);
-            for (int i = 1; i <=8; i++) {
-                s.append(pieceCreator(board, i, j, moves));
+        if (increment) {
+            for (int j = start;j <= end; j++) {
+                s.append(j);
+                for (int i = 1; i <=8; i++) {
+                    s.append(pieceCreator(board, i, j, moves));
+                }
+                s.append(SET_BG_COLOR_DARK_GREY).append(SET_TEXT_COLOR_WHITE).append(j).append("\n");
             }
-            s.append(SET_BG_COLOR_DARK_GREY).append(SET_TEXT_COLOR_WHITE).append(j).append("\n");
+        }
+        else {
+            for (int j = start; j >= end; j--) {
+                s.append(j);
+                for (int i = 1; i <=8; i++) {
+                    s.append(pieceCreator(board, i, j, moves));
+                }
+                s.append(SET_BG_COLOR_DARK_GREY).append(SET_TEXT_COLOR_WHITE).append(j).append("\n");
+            }
         }
         s.append(SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + "  " +"a" + "  " + "b" + "  " + "c" + "  " + "d"
                 + "  " + "e" + "  " + "f" + "  " + "g" + "  " + "h"  + EMPTY +
@@ -228,7 +231,7 @@ public class PostLoginUI {
         if (moves != null) {
             for (ChessMove move : moves) {
                 ChessPosition positionMove = move.getEndPosition();
-                if (positionMove == position) {
+                if (Objects.equals(positionMove,position)) {
                     highlight = true;
                     break;
                 }
