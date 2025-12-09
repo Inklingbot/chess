@@ -1,11 +1,13 @@
 package ui;
 
 
+import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import model.GameData;
 import model.ListGamesResult;
+import server.NotificationHandler;
 import server.ResponseException;
 
 import java.io.IOException;
@@ -19,35 +21,39 @@ import static ui.EscapeSequences.SET_TEXT_COLOR_WHITE;
 
 import server.ServerFacade;
 import server.WebSocketFacade;
-import websocket.commands.MakeMoveCommand;
-import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGame;
+import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
 
-public class GameplayUI {
+public class GameplayUI implements NotificationHandler {
     String authToken;
-    WebSocketFacade facadeWeb;
+    WebSocketFacade clientWebsocketFacade;
     Integer gameID;
     String playerColor;
     GameData game;
+    ChessGame chessGame;
     ServerFacade facade;
     public GameplayUI(String authToken, Integer gameID, String playerColor, ServerFacade facade) {
         this.authToken = authToken;
         this.gameID = gameID;
         this.playerColor = playerColor;
         this.facade = facade;
+        this.chessGame = null;
     }
 
     public void run() {
         Scanner scanner;
         try {
-            facadeWeb = new WebSocketFacade("localhost:8080",
-                            new ServerMessage   (ServerMessage.ServerMessageType.NOTIFICATION, "Connected"));
+            clientWebsocketFacade = new WebSocketFacade("http://localhost:8080",
+                            new Notification("Connected.\n"), this);
 
-            facadeWeb.joinGame(authToken, gameID);
+            clientWebsocketFacade.joinGame(authToken, gameID, playerColor);
             scanner = new Scanner(System.in);
             System.out.print("Welcome to the game!\n");
-            updateGameInUI();
-            System.out.println(redraw());
+//            updateGameInUI();
+//            System.out.println(redraw());
+//            System.out.println(redraw());
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -101,7 +107,22 @@ public class GameplayUI {
         String cmd = (tokens.length > 0) ? tokens[0] : "help";
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
 
-        if (Objects.equals(cmd, "redraw")) {
+        if (Objects.equals(cmd, "redraw"))  {
+            if (params.length > 0) {
+                throw new ResponseException(
+                        "Too many fields given!\n");
+            }
+        }
+        if (Objects.equals(cmd, "highlight")) {
+            if (params.length > 1) {
+                throw new ResponseException(
+                        "Too many fields given!\n");
+            }
+            if (params.length < 1) {
+                throw new ResponseException("You missed a field somewhere, check your syntax!\n");
+            }
+        }
+        else if (Objects.equals(cmd, "move")) {
             if (params.length < 2) {
                 throw new ResponseException(
                         "You missed a field somewhere, check your syntax!\n");
@@ -111,24 +132,14 @@ public class GameplayUI {
                         "Too many fields given!\n");
             }
         }
-        else if (Objects.equals(cmd, "make") || Objects.equals(cmd, "highlight")) {
-            if (params.length < 3) {
-                throw new ResponseException(
-                        "You missed a field somewhere, check your syntax!\n");
-            }
-            if (params.length > 3) {
-                throw new ResponseException(
-                        "Too many fields given!\n");
-            }
-        }
 
         return switch (cmd) {
             case "help" -> "";
             case "redraw" -> redraw();
             case "leave" -> leave();
-            case "make" -> move(params[1], params[2]);
+            case "move" -> move(params[0], params[1]);
             case "resign" -> resign();
-            case "highlight" -> legals(params[2]);
+            case "highlight" -> legals(params[0]);
             default -> "Invalid command.";
         };
     }
@@ -139,32 +150,39 @@ public class GameplayUI {
 
         public static final String HELP =
                 SET_TEXT_COLOR_GREEN + "Help " + SET_TEXT_COLOR_WHITE + "- see this screen again\n" +
-                        SET_TEXT_COLOR_GREEN + "Redraw Chess Board " + SET_TEXT_COLOR_WHITE +
+                        SET_TEXT_COLOR_GREEN + "Redraw " + SET_TEXT_COLOR_WHITE +
                         "- display board again\n" +
                         SET_TEXT_COLOR_GREEN + "Leave " + SET_TEXT_COLOR_WHITE
                         + "- Leave the game, go back to previous menu.\n" +
-                        SET_TEXT_COLOR_GREEN + "Make Move a-h1-8 a-h1-8" + SET_TEXT_COLOR_WHITE +
+                        SET_TEXT_COLOR_GREEN + "Move a-h1-8 a-h1-8" + SET_TEXT_COLOR_WHITE +
                         "- Make a valid move on your turn\n" +
                         SET_TEXT_COLOR_GREEN + "Resign " + SET_TEXT_COLOR_WHITE +
                         "- give up and forfeit the game.\n" +
-                        SET_TEXT_COLOR_GREEN + "Highlight Legal Moves a-h1-8" + SET_TEXT_COLOR_WHITE +
-                        "- show what move a piece can make\n";
+                        SET_TEXT_COLOR_GREEN + "Highlight a-h1-8 " + SET_TEXT_COLOR_WHITE +
+                        "- show what moves a piece can make\n";
 
 
     public String redraw() {
-        if (Objects.equals(playerColor, "white")) {
-            return PostLoginUI.drawBoardWhite(game.chessGame().getBoard(), null);
+        try {
+//            updateGameInUI();
+            if (Objects.equals(playerColor, "white")) {
+                return PostLoginUI.drawBoardWhite(chessGame.getBoard(), null);
+            }
+            else if (Objects.equals(playerColor, "black")){
+                return PostLoginUI.drawBoardBlack(chessGame.getBoard(), null);
+            }
+            else {
+                return PostLoginUI.drawBoardWhite(chessGame.getBoard(), null);
+            }
         }
-        else if (Objects.equals(playerColor, "black")){
-            return PostLoginUI.drawBoardBlack(game.chessGame().getBoard(), null);
+        catch(Exception e) {
+            System.out.println("There was an exception.");
         }
-        else {
-            return PostLoginUI.drawBoardWhite(game.chessGame().getBoard(), null);
-        }
+        return "";
     }
 
     public String leave() throws IOException, ResponseException {
-        facadeWeb.leaveGame(authToken, gameID);
+        clientWebsocketFacade.leaveGame(authToken, gameID);
         return ("You have left the game.");
     }
 
@@ -172,7 +190,7 @@ public class GameplayUI {
         ChessPosition position1 =  parseMove(startPos);
         ChessPosition position2 = parseMove(endPos);
         ChessPiece.PieceType promotionPiece = null;
-        if (game.chessGame().getBoard().getPiece(position1).getPieceType() == ChessPiece.PieceType.PAWN
+        if (chessGame.getBoard().getPiece(position1).getPieceType() == ChessPiece.PieceType.PAWN
                 && position2.getRow() == 8) {
             boolean inputPiece = false;
             Scanner scanner2 = new Scanner(System.in);
@@ -202,14 +220,15 @@ public class GameplayUI {
             scanner2.close();
         }
         ChessMove move = new ChessMove(position1, position2, promotionPiece);
-        facadeWeb.makeMove(move, authToken, gameID);
+        clientWebsocketFacade.makeMove(move, authToken, gameID);
         System.out.println("Move made.\n");
+        updateGameInUI();
         return redraw();
     }
 
-    public String resign() throws IOException, ResponseException {
-        facadeWeb.resign(authToken, gameID);
-        return ("You have resigned.");
+    public String resign() throws ResponseException {
+        clientWebsocketFacade.resign(authToken, gameID);
+        return ("You have resigned.\n");
     }
 
     public String legals(String pos) {
@@ -256,4 +275,23 @@ public class GameplayUI {
     }
 
 
+    @Override
+    public void notify(ServerMessage newMessage, String message) {
+        if (newMessage.getType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+            LoadGame outMessage = gson.fromJson(message, LoadGame.class);
+
+            ChessGame game = gson.fromJson(outMessage.getGame(), ChessGame.class);
+            this.game = new GameData(0, "white", "black", "name", game);
+            this.chessGame = game;
+            System.out.println(redraw());
+        }
+        else if (newMessage.getType() == ServerMessage.ServerMessageType.ERROR) {
+            ErrorMessage outMessage = gson.fromJson(message, ErrorMessage.class);
+            System.out.println(SET_TEXT_COLOR_RED + outMessage);
+        }
+        else if (newMessage.getType() == ServerMessage.ServerMessageType.NOTIFICATION){
+            Notification outMessage = gson.fromJson(message, Notification.class);
+            System.out.println(SET_TEXT_COLOR_MAGENTA + outMessage);
+        }
+    }
 }

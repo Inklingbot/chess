@@ -68,7 +68,8 @@ public class ServerFacade {
         try{
             var path = "/game";
             ListGamesRequest request = new ListGamesRequest(authToken);
-            return this.makeRequest("GET", path, null, ListGamesResult.class, authToken);
+            var thing = this.makeRequest("GET", path, null, ListGamesResult.class, authToken);
+            return thing;
         }
         catch(ResponseException e) {
             throw new ResponseException(e.getMessage());

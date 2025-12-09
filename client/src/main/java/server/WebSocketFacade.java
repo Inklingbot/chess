@@ -4,6 +4,7 @@ import chess.ChessMove;
 import com.google.gson.Gson;
 
 import jakarta.websocket.*;
+import ui.GameplayUI;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
@@ -18,7 +19,7 @@ public class WebSocketFacade extends Endpoint {
     Session session;
     ServerMessage serverMessage;
 
-    public WebSocketFacade(String url, ServerMessage serverMessage) throws ResponseException {
+    public WebSocketFacade(String url, ServerMessage serverMessage, NotificationHandler handler) throws ResponseException {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
@@ -32,7 +33,7 @@ public class WebSocketFacade extends Endpoint {
                 @Override
                 public void onMessage(String message) {
                     ServerMessage newMessage = new Gson().fromJson(message, ServerMessage.class);
-                    serverMessage.notify();
+                    handler.notify(newMessage, message);
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
@@ -45,7 +46,7 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void joinGame(String authToken, Integer gameID) throws ResponseException {
+    public void joinGame(String authToken, Integer gameID, String color) throws ResponseException {
         try {
             var action = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));

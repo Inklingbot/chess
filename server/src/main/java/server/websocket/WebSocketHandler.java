@@ -119,7 +119,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 //make the move
                 gameData.chessGame().makeMove(move);
                 gameDAO.updateGame(gameData.chessGame(), gameID);
-                String game = gson.toJson(gameData);
+                String game = gson.toJson(gameData.chessGame());
                 var notification = new LoadGame(game);
                 connections.broadcast(null, notification, gameID);
                 var moveNotify = new Notification(user + " made move " + move);
@@ -156,10 +156,18 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     String game = gson.toJson(gameData);
                     var notification = new LoadGame(game);
                     connections.show(session, notification, gameID);
-                    ServerMessage notify = new Notification(user + " has Joined.");
-                    connections.broadcast(session, notify, gameID);
-
-
+                    if (Objects.equals(gameData.whiteUsername(), user)) {
+                        ServerMessage notify = new Notification(user + " has Joined on White.");
+                        connections.broadcast(session, notify, gameID);
+                    }
+                    else if (Objects.equals(gameData.blackUsername(), user)) {
+                        ServerMessage notify = new Notification(user + " has Joined on Black.");
+                        connections.broadcast(session, notify, gameID);
+                    }
+                    else {
+                        ServerMessage notify = new Notification(user + " has Joined as an Observer.");
+                        connections.broadcast(session, notify, gameID);
+                    }
             }
             else {
                 var notification = new ErrorMessage("You're unauthorized! Please try again.");

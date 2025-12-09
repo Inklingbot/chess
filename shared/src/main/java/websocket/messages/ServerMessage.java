@@ -14,12 +14,15 @@ import com.google.gson.Gson;
  */
 public class ServerMessage {
     ServerMessageType type;
-    String message;
 
-    public ServerMessage(ServerMessageType type, String message) {
-        this.message = message;
+    public ServerMessage(ServerMessageType type) {
         this.type = type;
     }
+
+    public ServerMessageType getType() {
+        return type;
+    }
+
     public enum ServerMessageType {
         LOAD_GAME,
         ERROR,

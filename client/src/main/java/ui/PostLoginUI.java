@@ -223,10 +223,11 @@ public class PostLoginUI {
     public static String pieceCreator(ChessBoard board, int i, int j, Collection<ChessMove> moves) {
         String s = "";
         boolean highlight = false;
-        ChessPosition position = new ChessPosition(i, j);
+        ChessPosition position = new ChessPosition(j, i);
         if (moves != null) {
             for (ChessMove move : moves) {
-                if (move.endPosition() == position) {
+                ChessPosition positionMove = move.getEndPosition();
+                if (positionMove == position) {
                     highlight = true;
                     break;
                 }
@@ -289,5 +290,19 @@ public class PostLoginUI {
 
 
         return s;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PostLoginUI that = (PostLoginUI) o;
+        return Objects.equals(ids, that.ids) && Objects.equals(facade, that.facade) && Objects.equals(authToken, that.authToken);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ids, facade, authToken);
     }
 }
